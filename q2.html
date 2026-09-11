@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問2 脆弱性管理｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .quad-wrap{margin:16px 0;text-align:center;}
+  .quad-wrap svg{max-width:100%;height:auto;background:#fff;border:1px solid var(--border);}
+  .mondai ul{margin:6px 0 6px 1.4em;padding:0;}
+  .mondai li{margin-bottom:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問2　脆弱性管理</h1>
+  <div class="meta">令和7年度 春期 情報処理安全確保支援士試験 午後問題　問2／全6設問</div>
+
+  <div class="mondai">脆弱性管理に関する次の記述を読んで，設問に答えよ。
+
+　M社は，従業員3,000名の情報サービス業を営む企業である。ソフトウェアの開発・販売を行っており，自社ホームページのほか，販売したソフトウェアのサポート用Webサイトなど複数のWebサイト（以下，Webサイトをサイトという）を保有している。M社では，メンテナンスのために管理者が自宅や外出先からサイトにリモートアクセスする。セキュリティに関する問合せ窓口は，情報システム部が担当している。
+　M社が保有するサイトのうち，重要なサイト（以下，重要サイトという）は，プラットフォームに対する脆弱性診断（以下，PF診断という）及びWebアプリケーションプログラムに対する脆弱性診断（以下，Webアプリ診断といい，PF診断とWebアプリ診断を併せて両診断という）を初回リリース前に実施するルールになっている。初回リリース後の両診断の実施については任意である。重要サイトの指定は，扱う情報の重要性，停止による影響などを勘案し，各サイトの所管部門が判断している。重要サイト以外のサイトに対する両診断の実施は任意である。
+　両診断は，情報システム部の選定した専門ベンダーP社に依頼して実施，又は情報システム部の選定した脆弱性診断ツール（以下，診断ツールという）を用いて各サイト担当者が実施する。ただし，緊急の場合，情報システム部が実施することもある。P社のWebアプリ診断は，脆弱性が実際に悪用できることを確認した上で報告してくれるので，評判がよい。
+　脆弱性はCritical，High，Medium，Low，Noneの5段階の深刻度レベルに分類される。P社に依頼して診断を行う場合は，P社から深刻度レベルの報告を受ける。深刻度レベルは，情報システム部が選定した診断ツールの場合はCVSS基本値によって分類される。P社の診断では，P社が独自の知見でCVSS基本値を基に値を変え，分類している。M社では，深刻度レベルがHigh以上の場合は速やかな修正を必須とし，それ以外は所管部門が対応要否を判断する。
+
+〔脆弱性の報告〕
+　ある日，M社のキャンペーンサイトX（以下，サイトXという）のキャンペーンページにSQLインジェクションの脆弱性が存在しているという指摘が問合せ窓口に報告された。報告内容についてサイト担当者に確認したところ，脆弱性が存在する可能性があるとの回答であった。サイトXは重要サイトに指定されていなかった。サイトXの仕様を図1に示す。
+
+<ul>
+<li>Webサーバ，Webアプリケーションサーバ及びデータベース（以下，DBという）サーバから成る。</li>
+<li>キャンペーン情報をDBサーバに格納している。</li>
+<li>顧客情報は保有していない。</li>
+<li>キャンペーンページのURLのクエリパラメータにコンテンツ番号が含まれている。<br>URL例：https://site-x.m-sha.co.jp/info?article=20250101</li>
+<li>コンテンツ番号がDBサーバ上に存在しない場合，又はSQLが構文エラーになる場合は，“コンテンツがありません”というメッセージを返す。</li>
+<li>Webアプリケーションプログラムにおいて，クエリパラメータarticleの値はSQLでの検索では数値型として扱われる。</li>
+</ul>
+図1　サイトXの仕様（抜粋）
+
+　情報システム部のEさんとJ課長は，報告の内容を確認するために，情報システム部が診断ツールを実行する旨をサイトXの担当者に伝えた。
+　Webアプリ診断用の診断ツールを該当ページに対して実行したところ，深刻度レベルがHighのSQLインジェクションの脆弱性が検出された。SQLインジェクションの脆弱性検出時のクエリパラメータ及び応答を表1に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>クエリパラメータ</th><th>応答</th></tr>
+<tr><td>article=20250401</td><td>2025年4月1日のキャンペーンのコンテンツが返される。</td></tr>
+<tr><td>article=20250401'</td><td><span class="blank">a</span></td></tr>
+<tr><td>article=20250401'%20and%20'a'='a</td><td><span class="blank">b</span></td></tr>
+<tr><td>article=20250401'%20and%20'a'='b</td><td><span class="blank">c</span></td></tr>
+<tr><td>article=20250401%20and%201=0</td><td><span class="blank">d</span></td></tr>
+<tr><td>article=20250401%20and%201=1</td><td><span class="blank">e</span></td></tr>
+</table>
+表1　クエリパラメータ及び応答（概要）
+
+　Eさんは，速やかにサイト担当者に連絡し，インターネットからサイトXにアクセスできないようネットワーク構成を変更した上で，該当するプログラムを修正するよう依頼した。これに対してサイトXの担当者は，“重要情報の漏えいなどの問題が発生することはない。DBには重要情報もない。サイトXにアクセスできないようにする必要はない。”と主張した。それに対してEさんは，“本脆弱性はブラインドSQLインジェクションの脆弱性に該当する。そのため，表1と同様の手法を用いることによって，DBのテーブル名が特定できることになる。”と説明した。Eさんは，DBのテーブル名を使うと攻撃者が次にどのような攻撃を行えるかを説明し，対応する必要性を説いた。これを受け，迅速に対応が行われた。
+
+〔脆弱性が存在していた状況の確認と一斉診断の実施〕
+　対応完了後，情報システム部では，公開サイトは全て重要サイトに指定するようにルールを変更することにした。同時に，M社が保有する全ての公開サイトに対する一斉の両診断（以下，一斉診断という）を実施することにし，その診断をP社に依頼した。診断対象サイトの情報を表2に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>サイト名</th><th>サイト特性</th><th>社外利用者向けアカウントの作成方法</th><th>1日当たりのアクセス数</th><th>顧客情報有無</th><th>停止による影響</th></tr>
+<tr><td>サイトA</td><td>ECサイト</td><td>利用者が作成</td><td>10,000</td><td>有</td><td>大</td></tr>
+<tr><td>サイトB</td><td>業務サイト</td><td>管理者が発行</td><td>3,000</td><td>有</td><td>中</td></tr>
+<tr><td>サイトC</td><td>情報提供サイト</td><td>なし</td><td>10,000</td><td>無</td><td>小</td></tr>
+<tr><td>：</td><td>：</td><td>：</td><td>：</td><td>：</td><td>：</td></tr>
+<tr><td>サイトZ</td><td>（省略）</td><td>（省略）</td><td>（省略）</td><td>（省略）</td><td>（省略）</td></tr>
+</table>
+表2　診断対象サイトの情報
+
+　診断の結果，深刻度レベルHigh以上の脆弱性が検出されたサイトが数サイトあり，Medium以下の脆弱性が数十件検出されたサイトも多数あった。
+　サイトによっては，初回リリース時の両診断以降にアップデートや設定変更をしていないにもかかわらず，初回リリース時の両診断結果と今回の一斉診断結果が異なっている場合もあった。P社の診断は，決められた手順に従って行い，診断結果は技術レビューを行うので，診断員による差異はほぼないと，EさんはP社から聞いていた。また，初回リリース時の両診断では，サイトに不具合はなかったと報告を受けている。Eさんが，改めてP社に確認すると，診断結果が異なっていた要因は，<span class="blank">f</span>や<span class="blank">g</span>だった。これらのことから，Eさんは初回リリース後も定期的な両診断が必要であると結論づけた。
+
+〔PF診断で検出された脆弱性〕
+　PF診断で検出された脆弱性を表3に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>サイト名</th><th>脆弱性ID</th><th>脆弱性</th><th>深刻度レベル</th><th>CVSSv3基本値</th><th>補足</th></tr>
+<tr><td>サイトA</td><td>PA-1</td><td>SSL/TLSサーバの暗号強度が弱く，推奨されていない鍵交換をサポート</td><td>Medium</td><td>5.9</td><td>―</td></tr>
+<tr><td>サイトB</td><td>PB-1</td><td>OpenSSHでリモートから認証なしに任意のコード実行が可能</td><td>High</td><td>8.1</td><td>CVE番号：CVE-20XX-XXXXX</td></tr>
+<tr><td></td><td>PB-2</td><td>管理者用のWebのログイン画面に認証試行が何回でも可能</td><td>Medium</td><td>5.3</td><td>―</td></tr>
+<tr><td></td><td>PB-3</td><td>SSL/TLSサーバの暗号強度が弱く，推奨されていない鍵交換をサポート</td><td>Medium</td><td>5.9</td><td>―</td></tr>
+<tr><td>サイトC</td><td>PC-1</td><td>SSH接続の安全性を低下させることが可能</td><td>Medium</td><td>5.9</td><td>CVE番号：CVE-20YY-YYYYY</td></tr>
+<tr><td>サイトD</td><td>PD-1</td><td>（省略）</td><td>High</td><td>7.2</td><td>―</td></tr>
+<tr><td></td><td>PD-2</td><td>（省略）</td><td>Critical</td><td>9.8</td><td>―</td></tr>
+<tr><td>サイトE</td><td>PE-1</td><td>（省略）</td><td>Medium</td><td>6.5</td><td>―</td></tr>
+</table>
+表3　PF診断で検出された脆弱性（抜粋）
+
+　脆弱性PA-1とPB-3について，CRYPTRECが作成し，IPAが発行している“TLS暗号設定ガイドラインVer.3.1.0”の“4.推奨セキュリティ型の要求設定”には，表4に示す鍵交換におけるビットセキュリティの基準を満たすよう記載されていた。そのため，サイトA及びサイトBは基準を満たす設定に変更することにした。
+
+<table class="small-table" style="width:100%;">
+<tr><th>鍵交換プロトコル</th><th>基準</th></tr>
+<tr><td>ECDHE</td><td><span class="blank">h</span>ビットセキュリティ以上を満たす<span class="blank">i</span></td></tr>
+<tr><td>DHE</td><td><span class="blank">j</span>ビットセキュリティ以上を満たす<span class="blank">k</span></td></tr>
+</table>
+表4　鍵交換におけるビットセキュリティの基準
+
+　脆弱性PB-1は，管理者がメンテナンス用にリモートアクセスで使っているOpenSSHにおいて検出された。OpenSSHでは，ログインが一定時間内に成功しないと，認証試行のタイムアウト処理が実行される。脆弱性PB-1は，あるセキュリティベンダーの報告によると，認証試行のタイムアウト処理が同時に多数実行されると起き得る問題であり，認証試行の接続時間（LoginGraceTime）の設定が120秒の場合，その間に100件試行されると，OpenSSHのログに“Timeout before authentication”という認証タイムアウトのメッセージが多数出力され，3〜4時間で悪用に成功する可能性があるとのことだった。もしも，脆弱性を修正したバージョンのOpenSSHに更新できない場合には，次のいずれかを行う。
+
+・トレードオフはあるものの，認証試行にタイムアウトを設けないようにサーバの設定を変更する。
+・①サイト担当者が攻撃を早期に検知する方法を採用することによって被害を抑制する。
+
+　サイトBでは，OpenSSHの更新を行った。
+　脆弱性PB-2は，送信元IPアドレス制限が対策の一つだが現実的な運用が難しい。代わりの対策として，ログイン画面のアカウントロックがあるが，採用する場合はロック解除の運用方法や実装について検討が必要である。サイトBでは，②アクセス元のPCを認証する対策を採用した。
+
+〔Webアプリ診断で検出された脆弱性〕
+　Webアプリ診断で検出された脆弱性を表5に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>サイト名</th><th>脆弱性ID</th><th>脆弱性</th><th>深刻度レベル</th><th>CVSSv3基本値</th><th>補足</th></tr>
+<tr><td>サイトA</td><td>WA-1</td><td>本来閲覧できない画面を閲覧可能</td><td>Medium</td><td>4.3</td><td>購入機能で，商品の詳細を閲覧するリクエストに含まれるパラメータitemの5桁の数字を変更することによって一般会員が本来閲覧できない商品の説明画面を閲覧できた。評価指標を次に示す。<br>CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N</td></tr>
+<tr><td>サイトB</td><td>WB-1</td><td>本来閲覧できない画面を閲覧可能</td><td>Medium</td><td>5.3</td><td>管理者用アカウントでログインし，発注確認機能のURL（注）を確認後，一般利用者アカウントでログインし直し，Webブラウザのアドレスバーに当該URLを入力することによって，管理者用の画面を閲覧できた。この画面では，他人の発注情報が全て閲覧できた。評価指標を次に示す。<br>CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:N/A:N<br>（注）https://site-b.m-sha.co.jp/administrator0001/order_history</td></tr>
+<tr><td>サイトC</td><td>WC-1</td><td>OSコマンドインジェクション</td><td>Critical</td><td>9.8</td><td>問合せフォームが直接シェルに入力値を渡す作りになっていて，任意のOSコマンドが実行できた。ただし，管理者権限が必要な操作はできなかった。</td></tr>
+</table>
+表5　Webアプリ診断で検出された脆弱性（抜粋）
+
+　脆弱性WA-1とWB-1は，HTTPリクエストの内容を一部変更することによって本来閲覧できない画面を閲覧できるという点では同じであるが，評価指標の値が異なる。評価指標のうち，③Attack Complexity（AC）の値はそれぞれLとHであった。
+　脆弱性WC-1について，④管理者権限が必要な操作ができなかったのは，サイトCの仕様どおりであった。サイトCの仕様を図2に示す。
+
+<ul>
+<li>Webサーバ及びWebアプリケーションサーバから成る。</li>
+<li>DBサーバとの連携はしていない。</li>
+<li>Webアプリケーションプログラムは，一般利用者権限の専用アカウントでプロセスを実行している。</li>
+<li>問合せフォームに入力された値をメールコマンドで管理者宛てに送る。</li>
+<li>問合せ内容がログに保存され，その中にメールアドレスなどの個人情報をもつ。</li>
+<li>ログには特定のアカウントだけがアクセスできる。</li>
+</ul>
+図2　サイトCの仕様（抜粋）
+
+〔脆弱性評価方法の検討〕
+　一斉診断が一段落したところで，情報システム部は脆弱性管理についての課題を議論した。対応の要否判断が不適切であったサイトや対応が遅すぎたサイトがあったので，J課長は，Eさんに新たな脆弱性評価方法を検討するよう指示した。
+　はじめにEさんが調査したところ，IPAのホームページに“脆弱性対応におけるリスク評価手法のまとめ”というレポートが公開されていたので，これを参考にすることにした。Eさんは，検討内容をJ課長に報告した。次は，その際のEさんとJ課長の会話である。
+
+Eさん：レポートでは，対応要の脆弱性を簡易的な1次評価で選び，さらに，2次評価で優先度を評価する手法が提案されています。
+J課長：1次評価は具体的にはどのような評価をするのか。
+Eさん：1次評価では，基本値とExploit Prediction Scoring System（EPSS）値を用います。EPSS値の代わりにCVSSv3の現状値を用いる方法もありますが，⑤現状値とEPSS値を比べると，現状値は手間が掛かり，EPSS値は手間が掛からないとされています。1次評価では図3のように脆弱性を領域図で4領域に分類します。
+
+<div class="quad-wrap">
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <line x1="60" y1="20" x2="60" y2="250" stroke="#333" stroke-width="1.5"/>
+  <line x1="60" y1="250" x2="380" y2="250" stroke="#333" stroke-width="1.5"/>
+  <line x1="220" y1="20" x2="220" y2="250" stroke="#999" stroke-dasharray="4,3"/>
+  <line x1="60" y1="90" x2="380" y2="90" stroke="#999" stroke-dasharray="4,3"/>
+  <text x="55" y="14" font-size="12" text-anchor="end">EPSS値（%）</text>
+  <text x="55" y="24" font-size="11" text-anchor="end">100</text>
+  <text x="55" y="94" font-size="11" text-anchor="end">しきい値B</text>
+  <text x="55" y="254" font-size="11" text-anchor="end">0</text>
+  <text x="60" y="266" font-size="11" text-anchor="middle">0.0</text>
+  <text x="220" y="266" font-size="11" text-anchor="middle">しきい値A</text>
+  <text x="380" y="266" font-size="11" text-anchor="middle">10.0</text>
+  <text x="385" y="254" font-size="12">基本値</text>
+  <text x="300" y="55" font-size="16" text-anchor="middle">I</text>
+  <text x="140" y="55" font-size="16" text-anchor="middle">III</text>
+  <text x="300" y="175" font-size="16" text-anchor="middle">II</text>
+  <text x="140" y="175" font-size="16" text-anchor="middle">IV</text>
+</svg>
+</div>
+注記　EPSS値がしきい値Bの場合は，領域III又はIと，基本値がしきい値Aの場合は，領域I又はIIと考える。
+図3　1次評価の領域図
+
+J課長：しきい値はどうするのか。
+Eさん：しきい値Aは7.0に，しきい値Bは1%に設定しようと考えています。領域IVは対応不要とし，領域I〜IIIを2次評価の対象にします。
+J課長：なるほど。では，そのしきい値に設定してみて，対応すべき脆弱性に漏れが出るなどの問題があれば，しきい値を見直すことにしよう。
+Eさん：はい。分かりました。
+J課長：あとはEPSS値を用いた脆弱性評価について，しきい値の見直し以外にも，<span class="blank">l</span>を継続的に行うことで被害を防ぐ助けになるだろう。
+Eさん：分かりました。
+J課長：ところで，Webアプリ診断では，見つかった脆弱性のEPSS値が報告されないことが普通だが，どのように評価するのか。
+Eさん：⑥P社のWebアプリ診断であれば，見つかった脆弱性のEPSS値は，しきい値Bよりも高いとみなすのが妥当であると考えられます。Webアプリ診断で検出される脆弱性を，全て領域IかIIIとみなそうと考えています。
+J課長：その方法が安全だな。次に，2次評価はどうするのか。
+Eさん：2次評価は，環境値と先に評価した領域とを組み合わせた方法にしようと考えています。
+J課長：環境値を全て算出するのだな。
+Eさん：環境値の算出においては，現状評価基準の各評価指標を，“Not Defined”と設定することができます。環境評価基準での各評価指標の値の判断は各サイト担当者に依頼します。そして，表6に示す対応優先度表によってS〜Cの最終的な対応優先度を決定します。
+
+<table class="small-table" style="width:100%;">
+<tr><th rowspan="2">領域</th><th colspan="4">CVSSv3環境値</th></tr>
+<tr><th>0〜3.9</th><th>4.0〜6.9</th><th>7.0〜8.9</th><th>9.0〜10.0</th></tr>
+<tr><td>I，III</td><td>C</td><td>B</td><td>A</td><td>S</td></tr>
+<tr><td>II</td><td>C</td><td>C</td><td>B</td><td>A</td></tr>
+</table>
+表6　対応優先度表　（S：即時対応　A：対応優先度高　B：対応優先度中　C：対応優先度低）
+
+J課長：分かった。一斉診断の結果で幾つか評価して確認してほしい。
+Eさん：分かりました。
+
+〔対応優先度評価の実施〕
+　Eさんが2次評価を幾つか行った結果を表7及び表8に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>脆弱性ID</th><th>PB-1</th><th>PC-1</th><th>PD-1</th><th>PD-2</th><th>PE-1</th></tr>
+<tr><td>EPSS値（%）</td><td>39</td><td>96.54</td><td>0.0</td><td>2.6</td><td>8.7</td></tr>
+<tr><td>CVSSv3環境値</td><td>8.1</td><td>7.7</td><td>5.7</td><td>8.0</td><td>6.5</td></tr>
+<tr><td>対応優先度</td><td><span class="blank">m</span></td><td><span class="blank">n</span></td><td><span class="blank">o</span></td><td><span class="blank">p</span></td><td><span class="blank">q</span></td></tr>
+</table>
+表7　PF診断で検出された脆弱性に対する評価結果（抜粋）
+
+<table class="small-table" style="width:100%;">
+<tr><th>脆弱性ID</th><th>WA-1</th><th>WB-1</th><th>WC-1</th></tr>
+<tr><td>EPSS値（%）</td><td>対象外</td><td>対象外</td><td>対象外</td></tr>
+<tr><td>CVSSv3環境値</td><td>5.0</td><td>7.1</td><td>9.8</td></tr>
+<tr><td>対応優先度</td><td><span class="blank">r</span></td><td><span class="blank">s</span></td><td><span class="blank">t</span></td></tr>
+</table>
+表8　Webアプリ診断で検出された脆弱性に対する評価結果（抜粋）
+
+　この運用によって，脆弱性対応の優先度評価がサイト担当者によらず適切かつ迅速にできるようになった。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　表1中のa～eに入れる応答を，解答群の中から選び，記号で答えよ。なお，解答は重複して選んでもよい。</h2>
+  <div class="qa-item" data-points="15">
+    <div class="q-text">解答群　ア　“コンテンツがありません”というメッセージが返される。　イ　2025年4月1日のキャンペーンのコンテンツが返される。　ウ　サーバから応答が返されない。　エ　内部サーバエラーが返される。</div>
+    <div class="field-row" data-label="a" data-answer="ア" data-alt="">
+      <textarea maxlength="5" placeholder="a"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="b" data-answer="ア" data-alt="">
+      <textarea maxlength="5" placeholder="b"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="c" data-answer="ア" data-alt="">
+      <textarea maxlength="5" placeholder="c"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="d" data-answer="ア" data-alt="">
+      <textarea maxlength="5" placeholder="d"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="e" data-answer="イ" data-alt="">
+      <textarea maxlength="5" placeholder="e"></textarea><span class="charcount">0/5</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　本文中のf，gに入れる適切な字句を，それぞれ20字以内で答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="field-row" data-label="f" data-answer="新たな脆弱性が発見されたこと" data-alt="">
+      <textarea maxlength="20" placeholder="20字以内"></textarea><span class="charcount">0/20</span>
+    </div>
+    <div class="field-row" data-label="g" data-answer="リスクが変わったと評価し値を変えたこと" data-alt="">
+      <textarea maxlength="20" placeholder="20字以内"></textarea><span class="charcount">0/20</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔PF診断で検出された脆弱性〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 表4中のh～kに入れる適切な字句の組合せを答えよ（h=ビット数, i=形状, j=ビット数, k=用語）。</div>
+    <div class="field-row" data-label="h" data-answer="112" data-alt="">
+      <textarea maxlength="5" placeholder="h"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="i" data-answer="曲線" data-alt="">
+      <textarea maxlength="5" placeholder="i"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="j" data-answer="128" data-alt="">
+      <textarea maxlength="5" placeholder="j"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="k" data-answer="鍵長" data-alt="">
+      <textarea maxlength="5" placeholder="k"></textarea><span class="charcount">0/5</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線①について，検知する方法を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="OpenSSHのログに認証タイムアウトのメッセージの出力が多数あったらサイト担当者に電子メールでアラートを送る。" data-alt="">
+      <textarea maxlength="60" placeholder="60字程度"></textarea><span class="charcount">0/60</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(3) 本文中の下線②について，採用した対策を，20字以内で具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="クライアント認証を行う。" data-alt="">
+      <textarea maxlength="20" placeholder="20字以内"></textarea><span class="charcount">0/20</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4　〔Webアプリ診断で検出された脆弱性〕について答えよ。</h2>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(1) 本文中の下線③について，脆弱性WA-1のACがLと評価された評価根拠と脆弱性WB-1のACがHと評価された評価根拠を，それぞれ具体的に答えよ。</div>
+    <div class="field-row" data-label="WA-1" data-answer="パラメータitemの値が容易に推測できること" data-alt="">
+      <textarea maxlength="30" placeholder="30字程度"></textarea><span class="charcount">0/30</span>
+    </div>
+    <div class="field-row" data-label="WB-1" data-answer="発注確認機能のURLが推測困難であること" data-alt="発注確認機能のURLを入手する必要があること">
+      <textarea maxlength="30" placeholder="30字程度"></textarea><span class="charcount">0/30</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(2) 本文中の下線④について，該当するサイトCの仕様を，図2中の項番から選び，答えよ。</div>
+    <div class="field-row" data-label="" data-answer="3" data-alt="項番3">
+      <textarea maxlength="5" placeholder="項番"></textarea><span class="charcount">0/5</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問5 ========== -->
+  <h2 class="setumon">設問5　〔脆弱性評価方法の検討〕について答えよ。</h2>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(1) 本文中の下線⑤について，現状値は手間が掛かる理由とEPSS値は手間が掛からない理由を，それぞれ40字以内で答えよ。</div>
+    <div class="field-row" data-label="現状値" data-answer="攻撃コードなどの情報を多くの公開サイトにある情報から判断する必要があるから" data-alt="">
+      <textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span>
+    </div>
+    <div class="field-row" data-label="EPSS値" data-answer="FIRSTのサイトで公開されている値をそのまま使えばよいから" data-alt="">
+      <textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(2) 本文中のlに入れる適切な字句を，15字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="EPSS値の監視" data-alt="">
+      <textarea maxlength="15" placeholder="15字以内"></textarea><span class="charcount">0/15</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(3) 本文中の下線⑥について，妥当である理由を，30字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="診断時に実際に悪用できることを確認しているから" data-alt="">
+      <textarea maxlength="30" placeholder="30字以内"></textarea><span class="charcount">0/30</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問6 ========== -->
+  <h2 class="setumon">設問6　表7中及び表8中のm～tに入れる対応優先度を答えよ。</h2>
+  <div class="qa-item" data-points="16">
+    <div class="field-row" data-label="m（PB-1）" data-answer="A" data-alt="">
+      <textarea maxlength="3" placeholder="m"></textarea><span class="charcount">0/3</span>
+    </div>
+    <div class="field-row" data-label="n（PC-1）" data-answer="A" data-alt="">
+      <textarea maxlength="3" placeholder="n"></textarea><span class="charcount">0/3</span>
+    </div>
+    <div class="field-row" data-label="o（PD-1）" data-answer="C" data-alt="">
+      <textarea maxlength="3" placeholder="o"></textarea><span class="charcount">0/3</span>
+    </div>
+    <div class="field-row" data-label="p（PD-2）" data-answer="A" data-alt="">
+      <textarea maxlength="3" placeholder="p"></textarea><span class="charcount">0/3</span>
+    </div>
+    <div class="field-row" data-label="q（PE-1）" data-answer="B" data-alt="">
+      <textarea maxlength="3" placeholder="q"></textarea><span class="charcount">0/3</span>
+    </div>
+    <div class="field-row" data-label="r（WA-1）" data-answer="B" data-alt="">
+      <textarea maxlength="3" placeholder="r"></textarea><span class="charcount">0/3</span>
+    </div>
+    <div class="field-row" data-label="s（WB-1）" data-answer="A" data-alt="">
+      <textarea maxlength="3" placeholder="s"></textarea><span class="charcount">0/3</span>
+    </div>
+    <div class="field-row" data-label="t（WC-1）" data-answer="S" data-alt="">
+      <textarea maxlength="3" placeholder="t"></textarea><span class="charcount">0/3</span>
+    </div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 表・図は本文中に直接埋め込んでいます（画像ファイルは使用していません）。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="assets/engine.js"></script>
+</body>
+</html>
