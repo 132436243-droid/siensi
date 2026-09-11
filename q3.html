@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問3 スマートフォン用アプリケーションプログラムの開発｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .netbox{display:inline-block;border:1px solid #333;padding:6px 12px;margin:4px;border-radius:4px;background:#f5f7fa;font-size:0.9em;}
+  .seqtable td{text-align:left;vertical-align:top;}
+  .mondai code{background:#f0f2f5;padding:1px 5px;border-radius:3px;font-size:0.92em;}
+  .mondai ol{margin:6px 0 6px 1.4em;padding:0;}
+  .mondai ol li{margin-bottom:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問3　スマートフォン用アプリケーションプログラムの開発</h1>
+  <div class="meta">令和7年度 春期 情報処理安全確保支援士試験 午後問題　問3／全4設問</div>
+
+  <div class="mondai">スマートフォン用アプリケーションプログラムの開発に関する次の記述を読んで，設問に答えよ。
+
+　A社は，撮影機器の販売や写真のプリントサービスを全国に200店舗で展開する従業員2,000名の企業である。実店舗の運営に加え，インターネットを介して撮影機器の販売を行うECサイト事業を有している。このたび，会員がスマートフォン（以下，スマホという）用アプリケーションプログラム（以下，スマホ用アプリケーションプログラムをスマホアプリという）を通じて，写真入りのカレンダーなどのグッズ（以下，フォトグッズという）を注文できるサービス（以下，Eサービスという）を新規に開始することになった。Eサービス用スマホアプリ（以下，Fアプリという）は国内で流通する主要なスマホOSであるOS-αとOS-βの過去5年以内に正式リリースされたバージョンをサポートする。
+
+〔Eサービスの説明〕
+　Eサービスは，Fアプリとサーバサイドのシステム群で構成される。Fアプリは，インターネットを介してEサービス用Webサーバ（以下，A社Webサーバといい，FQDNはwww.a-sha.co.jpとする）及び大手クラウドサービスプロバイダC社のクラウドストレージサービス（以下，Cサービスという）との間でHTTPSを使用して通信する。フォトグッズの作成に使う写真は，FアプリからCサービスにアップロードする。
+
+<div style="text-align:center;margin:14px 0;">
+<span class="netbox">スマホ［Fアプリ］</span> ⇄ インターネット ⇄ <span class="netbox">A社［FW－A社Webサーバ－DBサーバ］</span><br>
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　⇅<br>
+　　　　　　　　　　　　　　　　　　　　　　　　　<span class="netbox">Cサービス</span>
+</div>
+図1　Eサービスのネットワーク構成（概要）
+
+<ol>
+<li>新規会員登録機能：Eサービスを利用するための新規会員登録を行う。</li>
+<li>ログイン機能：会員IDとパスワードでログインする。ログインした会員には，認証トークン（注）が払い出され，ログアウトするまでの間，Fアプリに保存される。認証トークンは，A社Webサーバ上で会員のセッションを識別するために使用する推測困難な値である。</li>
+<li>フォトグッズ注文機能：Fアプリ上でフォトグッズを注文する。ログイン済み会員だけが利用できる。なお，フォトグッズは，指定したA社の実店舗で受け取ることができる。</li>
+<li>キャンペーン案内機能：キャンペーンのWebページ（以下，キャンペーンページという）を表示する。ログイン済み会員だけが利用できる。なお，キャンペーンに応募することによって，フォトグッズの割引などに利用可能なクーポンを入手できる。会員には，電子メール（以下，メールという）などを通じて，期間限定のキャンペーンを案内する。キャンペーンの内容は，2週間ごとに更新される。</li>
+</ol>
+（注）認証トークンは，ログイン後にFアプリがA社Webサーバに HTTP リクエストを送信する際，Authorizationヘッダーに指定される。
+図2　Eサービスの機能概要（抜粋）
+
+　Fアプリの画面構成（抜粋）：初期画面（新規会員登録へ／ログイン画面へ）→ ログイン画面（会員ID・パスワードを入力し「ログイン」）→ ホーム画面（フォトグッズ注文／キャンペーン案内／ログアウト）→（キャンペーン案内から）キャンペーン案内画面（キャンペーンページを表示）。キャンペーンページはHTML形式で作成し，A社Webサーバにアップロードしておく。
+図3　Fアプリの画面構成（抜粋）
+
+　フォトグッズの注文処理の流れを図4に示す。
+
+<table class="small-table seqtable" style="width:100%;">
+<tr><th>順</th><th>処理・通信内容</th></tr>
+<tr><td>1</td><td>Fアプリ → A社Webサーバ：フォトグッズを注文</td></tr>
+<tr><td>2</td><td>A社Webサーバの処理：<span class="blank">（あ）</span></td></tr>
+<tr><td>3</td><td>A社Webサーバの処理：注文内容をDBサーバに登録し，注文番号を採番</td></tr>
+<tr><td>4</td><td>A社Webサーバの処理：<span class="blank">（い）</span></td></tr>
+<tr><td>5</td><td>A社Webサーバ → Fアプリ：注文番号を通知</td></tr>
+<tr><td>6</td><td>Fアプリの処理：<span class="blank">（う）</span></td></tr>
+<tr><td>7</td><td>Fアプリの処理：写真を“nnnnnnnn.zip”というファイル名でZIP形式に圧縮</td></tr>
+<tr><td>8</td><td>Fアプリの処理：<span class="blank">（え）</span></td></tr>
+<tr><td>9</td><td>Fアプリ → Cサービス：nnnnnnnn.zipをアップロード</td></tr>
+<tr><td>10</td><td>Cサービスの処理：<span class="blank">（お）</span></td></tr>
+<tr><td>11</td><td>Cサービス → Fアプリ：アップロード成功を通知</td></tr>
+</table>
+（注記）“nnnnnnnn”は注文番号であり，00000001から始まる十進数の連番である。
+図4　フォトグッズの注文処理の流れ
+
+<ol>
+<li>サービスの概要
+  <ol type="1">
+  <li>Cサービスはマルチテナントのストレージサービスである。テナントの管理権限をもつ利用者（以下，管理者という）が作成したストレージに対し，テナントの作成したシステム（以下，利用システムという）からファイルのアップロードやダウンロード（以下，アップロード，ダウンロードを併せてファイル操作という）を行う。</li>
+  <li>管理者は，ストレージの作成時に任意のストレージ名を設定する。ストレージを作成すると，Cサービスからアクセスキーが発行される。アクセスキーはストレージごとに異なる40字の英数字である。</li>
+  <li>利用システムは，ストレージ上のファイルをURLのパスで指定する。例えば，ストレージ“●●●”上のファイル“▲▲▲”をファイル操作する際は，“/●●●/▲▲▲”を指定する。ファイルのアップロードにはHTTPのPUTメソッドを，ファイルのダウンロードにはGETメソッドを用いる。</li>
+  <li>利用システムは，次の方式a又は方式bでファイル操作を行う。</li>
+  </ol>
+</li>
+<li>方式a：アクセスキーをHTTPリクエストのAuthorizationヘッダーに指定する方式である。利用システムは，Cサービスから発行されたアクセスキーを用いることによって，アクセスキーに対応するストレージに格納された全てのファイルに対するファイル操作が可能となる。Authorizationヘッダーに正しいアクセスキーが指定されていない場合，ファイル操作は拒否される。<br>
+使用例：ストレージ“abc”上のファイル“xyz”をダウンロードする際に送信するHTTPリクエスト<br>
+<code>GET /abc/xyz HTTP/1.1<br>Host: storage.c-sha.jp<br>Authorization: Bearer ○○○</code></li>
+<li>方式b：有効期限（Expires）と署名値（Signature）をクエリパラメータとして付加したURL（以下，署名付きURLという）を用いて，特定のファイルに対するファイル操作を一時的に可能とする方式である。ここで，Expiresパラメータに指定する有効期限はUNIXタイムスタンプ形式である。署名値の生成は次のように行う。
+  <ol type="i">
+  <li>GET又はPUTから始まり，パス中の“/●●●/▲▲▲?Expires=【有効期限】”で終わる文字列を署名対象文字列とする。</li>
+  <li>アクセスキーを秘密鍵とする。</li>
+  <li>署名対象文字列と秘密鍵からHMAC-SHA256値を求める。</li>
+  <li>(iii)で求めた値をbase64urlエンコードする。</li>
+  </ol>
+利用システムは，署名付きURLを生成し，ファイル操作を許可する利用者に伝える。伝えられた利用者は，署名付きURLを指定してHTTPリクエストを送ることによって，ファイル操作ができる。有効期限が切れた場合やサーバ側で署名値の検証が失敗した場合は，ファイル操作が拒否される。</li>
+</ol>
+図5　Cサービスの仕様（抜粋）
+
+　Eサービスで使うCサービスのストレージ名は，e-serviceである。Fアプリでは，方式aを利用する。アクセスキーは，鍵長256ビットの共通鍵とAES-CBCアルゴリズムで暗号化し，Fアプリ内にリソースとして保存する。Cサービスのストレージ名並びにAES-CBCの共通鍵及び初期ベクトルは，Fアプリのコード中に定数として定義する。
+
+〔キャンペーン案内機能の実装方法〕
+　Fアプリでのキャンペーンページの表示には，WebViewという仕組みを用いる。WebViewは，スマホOSの提供する仕組みであり，スマホアプリの画面の一部にWebページを表示させることができる。キャンペーンページのHTMLは，WebViewを用いて，Fアプリの画面上に表示させる。
+　会員に送るキャンペーン案内のメール本文中には，Fアプリでキャンペーンページを表示するためのURL（以下，F-URLという）を含める。会員がメールアプリからF-URLを開くと，Fアプリが起動し，WebView上にキャンペーンページが表示される。キャンペーンページからキャンペーンに応募する際の会員のセッションの識別には，Fアプリに保存されている認証トークンを用いる。OS-αでは，キャンペーンページが表示された後に，WebViewの機能によってキャンペーンページ上のECMAScriptコードがFアプリのgetToken関数を呼び出す。これによって，認証トークンがFアプリからキャンペーンページに引き渡される。OS-βでは別の方式で同様の機能を実現する。キャンペーンページ上のECMAScriptコードを図6に示す。
+
+<code>const token = f_app.getToken();</code>
+図6　キャンペーンページ上のECMAScriptコード
+
+　キャンペーンページ以外からgetToken関数を悪用されないように，getToken関数の内部では，次のように呼出し元のWebページのURLを確認する。
+　「呼出し元のWebページのURLの先頭は“https://www.a-sha.co.jp”か。→ Yesなら認証トークンを返す。→ Noなら空文字列，つまり長さ0の文字列を返す。」
+図7　getToken関数の処理の流れ
+
+<code>f-app://campaign?url=https://www.a-sha.co.jp/campaign/□□□</code>
+（注記1）“f-app”はカスタムURLスキームである。（注記2）“□□□”はキャンペーンページのURLのパスである。
+図8　F-URLの例
+
+〔Fアプリの脆弱性診断結果〕
+　A社は，セキュリティ専門会社のD社に依頼してFアプリの脆弱性診断を実施した。その結果，表1に示す脆弱性が検出された。
+
+<table class="small-table" style="width:100%;">
+<tr><th>脆弱性</th><th>脆弱性の概要</th><th>解説</th></tr>
+<tr><td>1</td><td>サーバ証明書の検証不備がある。</td><td>Fアプリは，HTTPSでサーバと接続する際，サーバ証明書の検証エラーがあっても無視し，通信を続行する。そのため，HTTPS通信の内容が盗聴されたり，改ざんされたりするおそれがある。<u>盗聴されると，①盗聴した内容からアクセスキーとストレージ名を攻撃者が取得するおそれがある。</u>（省略）</td></tr>
+<tr><td>2</td><td>CサービスのアクセスキーのCサービスの保護に不備がある。</td><td><u>②攻撃者がFアプリから平文のアクセスキーとストレージ名を取得できる。</u>そのアクセスキーを用いて，<u>③攻撃者がEサービスの全利用者の写真を不正にダウンロードするおそれがある。</u>（省略）</td></tr>
+<tr><td>3</td><td>F-URLの処理にアクセス制御の不備がある。</td><td>F-URLのurlクエリパラメータに，<u>④細工したURLが指定されることによって，攻撃者のWebサイトにアクセスしてしまうおそれがある。</u>また，攻撃者が会員の認証トークンを取得するおそれがある。（省略）</td></tr>
+</table>
+表1　脆弱性診断結果（抜粋）
+
+〔脆弱性1〕
+　Fアプリの開発チームに所属するUさんは，D社のSさんが開催する診断結果報告会に参加した。
+　Uさんは，脆弱性1が作り込まれた経緯を説明した。Uさんによると，FアプリとA社Webサーバとの間の通信内容に異常がないかどうかを調査するために，開発用PCで通信解析ツールを利用した。この通信解析ツールはプロキシサーバとして動作する。このツールを利用すると，Fアプリでは，サーバ証明書の検証エラーが発生し，FアプリとA社Webサーバとの間の通信が中断されてしまった。そこで，インターネット上のある記事でエラーが発生しても通信を続行する方法が紹介されていたのを参考にして，Fアプリのコードを変更したということであった。
+　この通信解析ツールを利用し，“https://www.a-sha.co.jp/campaign/□□□”にアクセスした際のレイヤー4〜7の通信フローの例を図9に示す（通信解析ツールのプライベートIPアドレスは，○○○.○○○.○○○.○○○とする）。
+
+<table class="small-table seqtable" style="width:100%;">
+<tr><th>#</th><th>送信元→宛先</th><th>内容</th></tr>
+<tr><td>1</td><td>スマホ ⇔ 通信解析ツール</td><td>TCPの3ウェイハンドシェイク</td></tr>
+<tr><td>2</td><td>スマホ → 通信解析ツール</td><td><span class="blank">a</span> を送信</td></tr>
+<tr><td>3</td><td>通信解析ツール → スマホ</td><td><span class="blank">b</span> を送信</td></tr>
+<tr><td>4</td><td>スマホ → 通信解析ツール</td><td><span class="blank">c</span> を送信</td></tr>
+<tr><td>5</td><td>（通信解析ツール内処理）</td><td>⑤サーバ証明書を生成（自身のプライベート認証局機能を用いる）</td></tr>
+<tr><td>6</td><td>通信解析ツール → スマホ（まとめて送信）</td><td>(1)<span class="blank">d</span>　(2)Encrypted Extensions　(3)<span class="blank">e</span>　(4)<span class="blank">f</span>　(5)<span class="blank">g</span></td></tr>
+<tr><td>7</td><td>スマホ → 通信解析ツール</td><td><span class="blank">g</span> を送信</td></tr>
+<tr><td>8</td><td>スマホ → 通信解析ツール</td><td><span class="blank">h</span> を送信</td></tr>
+<tr><td>9</td><td>通信解析ツール ⇔ A社Webサーバ</td><td>TCPの3ウェイハンドシェイク</td></tr>
+<tr><td>10</td><td>（同左のTLSハンドシェイクと同様のフロー）</td><td>―</td></tr>
+<tr><td>11</td><td>通信解析ツール → A社Webサーバ</td><td><span class="blank">h</span> を送信</td></tr>
+<tr><td>12</td><td>A社Webサーバ → 通信解析ツール</td><td><span class="blank">b</span> を送信</td></tr>
+<tr><td>13</td><td>通信解析ツール → スマホ</td><td><span class="blank">b</span> を送信</td></tr>
+</table>
+図9　通信解析ツールを利用した際の通信フローの例（抜粋）
+
+　Uさんは，通信解析ツールを利用してテストを行う際も通信を正常に続行させる方法をチーム内で話し合った。その結果，今後，開発用のスマホに⑥必要な設定を行うことにした。加えて，OS-αではテストを行う際だけその設定を有効化するように，Fアプリの中にも設定を追加した。
+
+〔脆弱性2〕
+　脆弱性2への対応について，Sさんからは方式bを利用し，その際に署名付きURLの生成を図4中の<span class="blank">i</span>の時点で行ってはどうかとの提案があった。Uさんは Sさんの提案を了承した。
+
+〔脆弱性3〕
+　次は，脆弱性3についてのUさんとSさんの会話である。
+
+Uさん：対策として，図7の処理を修正します。
+Sさん：図7の処理を修正すれば，認証トークンを盗まれるリスクは回避できます。しかし，Webブラウザと比べると，⑦フィッシングサイトにアクセスしてしまっても気付くことができないというFアプリの仕様上の問題点が残ります。フィッシングサイトに気付くことができるようにするための機能か，そもそもフィッシングサイトにアクセスできないようにする機能が必要です。
+Uさん：はい。図7の処理の修正に加えて，⑧フィッシングサイトにアクセスできないようにする機能を実装します。
+
+　A社は，検出された脆弱性を修正し，Eサービスの提供を開始した。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　〔Fアプリの脆弱性診断結果〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 表1中の下線①について，アクセスキーを取得する方法を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="Cサービスに送られたHTTPリクエストのAuthorizationヘッダーから取り出す。" data-alt="">
+      <textarea maxlength="45" placeholder="45字程度"></textarea><span class="charcount">0/45</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 表1中の下線②について，アクセスキーを取得する方法を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="Fアプリを解析し，暗号化されたアクセスキー並びに共通鍵及び初期ベクトルを入手し，暗号化されたアクセスキーをAES-CBCで復号する。" data-alt="">
+      <textarea maxlength="70" placeholder="70字程度"></textarea><span class="charcount">0/70</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(3) 表1中の下線③について，ダウンロードする方法を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="ファイル名に含まれる注文番号を00000001から順に増やしてダウンロードを試行する。" data-alt="">
+      <textarea maxlength="45" placeholder="45字程度"></textarea><span class="charcount">0/45</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(4) 表1中の下線④について，攻撃者のWebサイトにアクセスさせることができるように細工したURLの例を，攻撃者が取得したドメイン名をk-sha.co.jpとした場合で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="https://www.a-sha.co.jp.k-sha.co.jp/" data-alt="https://www.a-sha.co.jp@k-sha.co.jp/|https://k-sha.co.jp/">
+      <textarea maxlength="45" placeholder="URL例"></textarea><span class="charcount">0/45</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔脆弱性1〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 図9中の下線⑤について，サーバ証明書のSubject Alternative Nameの値を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="www.a-sha.co.jp" data-alt="">
+      <textarea maxlength="30" placeholder="値"></textarea><span class="charcount">0/30</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="16">
+    <div class="q-text">(2) 図9中のa～hに入れる適切な字句を，解答群（ア〜コ）の記号で答えよ。<br>ア Certificate／イ Certificate Verify／ウ Client Hello／エ CONNECT ○○○.○○○.○○○.○○○:443／オ CONNECT www.a-sha.co.jp:443／カ Finished／キ GET /campaign/□□□ HTTP/1.1／ク HTTPステータスコード101／ケ HTTPステータスコード200 (OK)／コ Server Hello</div>
+    <div class="field-row" data-label="a" data-answer="オ" data-alt=""><textarea maxlength="3" placeholder="a"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="b" data-answer="ケ" data-alt=""><textarea maxlength="3" placeholder="b"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="c" data-answer="ウ" data-alt=""><textarea maxlength="3" placeholder="c"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="d" data-answer="コ" data-alt=""><textarea maxlength="3" placeholder="d"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="e" data-answer="ア" data-alt=""><textarea maxlength="3" placeholder="e"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="f" data-answer="イ" data-alt=""><textarea maxlength="3" placeholder="f"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="g" data-answer="カ" data-alt=""><textarea maxlength="3" placeholder="g"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="h" data-answer="キ" data-alt=""><textarea maxlength="3" placeholder="h"></textarea><span class="charcount">0/3</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(3) 本文中の下線⑥について，設定の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="通信解析ツールのプライベート認証局のルート証明書をインストールし，信頼設定を行う。" data-alt="">
+      <textarea maxlength="45" placeholder="45字程度"></textarea><span class="charcount">0/45</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　本文中のiに入れる記号を，図4中の（あ）～（お）から選び，答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="field-row" data-label="" data-answer="い" data-alt="（い）">
+      <textarea maxlength="5" placeholder="（あ）～（お）"></textarea><span class="charcount">0/5</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4　〔脆弱性3〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 本文中の下線⑦について，問題点を，20字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="URLを確認する手段がない。" data-alt="">
+      <textarea maxlength="20" placeholder="20字以内"></textarea><span class="charcount">0/20</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線⑧について，実装する機能を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="WebViewを呼び出す前に，URLの先頭がhttps://www.a-sha.co.jp/であるかを検証する。" data-alt="">
+      <textarea maxlength="50" placeholder="50字程度"></textarea><span class="charcount">0/50</span>
+    </div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="assets/engine.js"></script>
+</body>
+</html>
