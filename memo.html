@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情報処理安全確保支援士 午後問題 演習（プロトタイプ）</title>
+<style>
+  :root{
+    --main-bg:#ffffff;
+    --sub-bg:#f5f7fa;
+    --border:#dde2e8;
+    --accent:#1f5fae;
+    --accent-dark:#164680;
+    --text:#222;
+    --maru:#1e8e3e;
+    --sankaku:#e0a800;
+    --batu:#d93025;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:var(--sub-bg);
+    color:var(--text);
+    margin:0;
+    padding:24px 12px 80px;
+    line-height:1.8;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  h1{font-size:1.3em;border-bottom:3px solid var(--accent);padding-bottom:8px;}
+  .meta{font-size:0.85em;color:#666;margin-bottom:20px;}
+
+  .mondai{
+    background:var(--main-bg);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:20px 24px;
+    margin-bottom:20px;
+    white-space:pre-wrap;
+  }
+  .mondai .blank{
+    display:inline-block;
+    min-width:1.6em;
+    text-align:center;
+    font-weight:bold;
+    border-bottom:1.5px solid var(--text);
+    margin:0 2px;
+  }
+  .img_margin{margin:16px 0;text-align:center;}
+  .img_margin img{max-width:100%;border:1px solid var(--border);}
+  .img_placeholder{
+    border:1px dashed #aaa;
+    background:#fafafa;
+    color:#888;
+    padding:40px 10px;
+    text-align:center;
+    font-size:0.85em;
+  }
+
+  h2.setumon{
+    font-size:1.05em;
+    background:var(--accent);
+    color:#fff;
+    display:inline-block;
+    padding:4px 14px;
+    border-radius:3px 3px 0 0;
+    margin:28px 0 0;
+  }
+
+  .qa-item{
+    background:var(--main-bg);
+    border:1px solid var(--border);
+    border-radius:0 4px 4px 4px;
+    padding:16px 20px;
+    margin-bottom:4px;
+  }
+  .qa-item .q-text{margin-bottom:10px;}
+  .qa-item .points-tag{
+    float:right;
+    font-size:0.8em;
+    color:#fff;
+    background:#8a94a3;
+    border-radius:10px;
+    padding:2px 10px;
+  }
+  .qa-item textarea{
+    width:100%;
+    max-width:480px;
+    height:2.4em;
+    resize:vertical;
+    font-size:1em;
+    padding:6px 8px;
+    border:1px solid #bbb;
+    border-radius:3px;
+    font-family:inherit;
+  }
+  .charcount{font-size:0.8em;color:#888;margin-left:6px;}
+
+  .result-box{
+    display:none;
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:3px;
+    font-size:0.92em;
+  }
+  .result-box.show{display:block;}
+  .result-box .score-line{font-weight:bold;margin-bottom:6px;}
+  .result-box.maru{background:#e7f6ec;border:1px solid var(--maru);}
+  .result-box.sankaku{background:#fff8e5;border:1px solid var(--sankaku);}
+  .result-box.batu{background:#fdecea;border:1px solid var(--batu);}
+  .result-box .label{
+    display:inline-block;
+    color:#fff;
+    font-weight:bold;
+    border-radius:3px;
+    padding:1px 8px;
+    margin-right:8px;
+    font-size:0.85em;
+  }
+  .result-box.maru .label{background:var(--maru);}
+  .result-box.sankaku .label{background:var(--sankaku);}
+  .result-box.batu .label{background:var(--batu);}
+  .model-answer{margin-top:4px;color:#333;}
+  .model-answer b{color:var(--accent-dark);}
+
+  #scoreSummary{
+    display:none;
+    position:sticky;
+    bottom:0;
+    background:#fff;
+    border-top:2px solid var(--accent);
+    padding:14px 20px;
+    margin-top:24px;
+    border-radius:4px 4px 0 0;
+    box-shadow:0 -2px 8px rgba(0,0,0,.08);
+    text-align:center;
+    font-size:1.15em;
+    font-weight:bold;
+  }
+  #scoreSummary.show{display:block;}
+  #scoreSummary span{color:var(--accent-dark);font-size:1.3em;}
+
+  #gradeBtn{
+    display:block;
+    margin:28px auto 0;
+    width:280px;
+    height:48px;
+    font-size:1.05em;
+    font-weight:bold;
+    color:#fff;
+    background:var(--accent);
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  #gradeBtn:hover{background:var(--accent-dark);}
+  #gradeBtn:disabled{background:#aaa;cursor:default;}
+
+  .note{font-size:0.8em;color:#888;margin-top:30px;border-top:1px dashed var(--border);padding-top:10px;}
+
+  /* ---- マーカー機能 ---- */
+  .mondai{user-select:text;cursor:text;}
+  .mondai mark{
+    padding:0 1px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+  .mondai mark.mk-yellow{background:#fff17a;}
+  .mondai mark.mk-pink{background:#ffb3c6;}
+  .mondai mark.mk-blue{background:#a8d4ff;}
+  .mondai mark.mk-green{background:#b6f0b6;}
+
+  #markerPopup{
+    display:none;
+    position:absolute;
+    z-index:50;
+    background:#2b2f36;
+    border-radius:20px;
+    padding:6px 8px;
+    box-shadow:0 3px 10px rgba(0,0,0,.25);
+    white-space:nowrap;
+  }
+  #markerPopup.show{display:flex;gap:6px;align-items:center;}
+  #markerPopup .swatch{
+    width:22px;height:22px;
+    border-radius:50%;
+    border:2px solid #fff;
+    cursor:pointer;
+    padding:0;
+  }
+  #markerPopup .swatch.mk-yellow{background:#fff17a;}
+  #markerPopup .swatch.mk-pink{background:#ffb3c6;}
+  #markerPopup .swatch.mk-blue{background:#a8d4ff;}
+  #markerPopup .swatch.mk-green{background:#b6f0b6;}
+  #markerPopup .eraser{
+    width:22px;height:22px;
+    border-radius:50%;
+    border:2px solid #fff;
+    background:#555;
+    color:#fff;
+    font-size:12px;
+    line-height:1;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>情報処理安全確保支援士試験 午後問題 演習（プロトタイプ）</h1>
+  <div class="meta">サンプル問題：ネットワークセキュリティ対策の見直し ／ 全3設問 ／ 記述式</div>
+
+  <!-- ================= 問題文 ================= -->
+  <div class="mondai">次の記述を読んで，設問1～3に答えよ。
+
+　Y社は，従業員300名の製造業であり，本社内のデータセンタに複数のサーバを設置して各種業務システムを運用している。近年，標的型攻撃メールを発端とする情報漏えい事案が業界内で相次いだことを受け，情報システム部のB主任は，社内ネットワークのセキュリティ対策を見直すこととした。
+
+〔現状のネットワーク構成〕
+　現在，社内LANとインターネットの境界にはファイアウォール（以下，FWという）を設置し，外部からの不要な通信を遮断している。しかし，社内から外部への通信については，Webアクセス及びメール送信を除き，特に制限を設けていない。また，マルウェア対策ソフトは全端末に導入されているが，パターンファイルの更新は利用者の手動操作に委ねられている。
+
+<div class="img_margin">
+  <div class="img_placeholder">［表1：現状のネットワーク機器一覧（画像埋め込み想定）<br>実際の問題では ./img/xxx.png 等の画像ファイルをここに挿入］</div>
+</div>
+
+〔B主任の検討〕
+　B主任は，標的型攻撃対策として，まず外部との不審な通信を検知する仕組みが必要と考えた。具体的には，マルウェアが外部の指令サーバと通信する際の特徴的な挙動に着目し，<span class="blank">a</span>を監視することで早期に検知する方針とした。
+　また，仮に1台の端末がマルウェアに感染した場合でも被害を社内の他システムに拡大させないよう，NW区分ごとに通信を制限する<span class="blank">b</span>の考え方を導入することとした。
+　さらに，マルウェア対策ソフトの実効性を高めるため，パターンファイルの更新について，<span class="blank">c</span>という運用ルールに変更することを提案した。
+</div>
+  <div class="meta" style="margin-top:-14px;">💡 問題文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <div id="markerPopup">
+    <button type="button" class="swatch mk-yellow" data-color="mk-yellow" title="黄"></button>
+    <button type="button" class="swatch mk-pink" data-color="mk-pink" title="ピンク"></button>
+    <button type="button" class="swatch mk-blue" data-color="mk-blue" title="青"></button>
+    <button type="button" class="swatch mk-green" data-color="mk-green" title="緑"></button>
+  </div>
+
+  <!-- ================= 設問1 ================= -->
+  <h2 class="setumon">設問1</h2>
+  <div class="qa-item" data-answer="外部の指令サーバとの通信先IPアドレスやドメイン" data-alt="外部の攻撃者が用いる指令サーバとの通信" data-maxlen="25">
+    <div class="q-text">本文中の<b>a</b>に入れる適切な字句を，25字以内で述べよ。<span class="points-tag">配点 10点</span></div>
+    <textarea maxlength="25" placeholder="25字以内"></textarea><span class="charcount">0/25</span>
+    <div class="result-box"></div>
+  </div>
+
+  <!-- ================= 設問2 ================= -->
+  <h2 class="setumon">設問2</h2>
+  <div class="qa-item" data-answer="ネットワークセグメンテーション" data-alt="セグメント分割|ネットワークの分離" data-maxlen="15">
+    <div class="q-text">本文中の<b>b</b>に入れる適切な字句を，15字以内で述べよ。<span class="points-tag">配点 10点</span></div>
+    <textarea maxlength="15" placeholder="15字以内"></textarea><span class="charcount">0/15</span>
+    <div class="result-box"></div>
+  </div>
+
+  <!-- ================= 設問3 ================= -->
+  <h2 class="setumon">設問3</h2>
+  <div class="qa-item" data-answer="定期的に自動更新する仕組みに変更する" data-alt="自動更新の仕組みを導入する" data-maxlen="20">
+    <div class="q-text">本文中の<b>c</b>に入れる適切な字句を，20字以内で述べよ。<span class="points-tag">配点 10点</span></div>
+    <textarea maxlength="20" placeholder="20字以内"></textarea><span class="charcount">0/20</span>
+    <div class="result-box"></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ これはプロトタイプです。実際の問題を追加する場合は <code>.qa-item</code> の
+    <code>data-answer</code>（模範解答），<code>data-alt</code>（別解，"|"区切り），
+    <code>data-maxlen</code>（文字数上限）を書き換えてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   採点エンジン
+   参考実装（過去問道場方式）を踏襲した文字集合ベースの類似度採点。
+   AIによる採点は行わない。
+========================================================= */
+
+// 全角記号・英数字を半角に変換
+function toHalfWidth(str) {
+  return str.replace(/[！-～]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 65248));
+}
+
+// 正規化：空白・句読点除去、全角→半角、大文字小文字統一
+function normalize(str) {
+  return toHalfWidth(str)
+    .replace(/[\s、。，,]+/g, "")
+    .replace(/[－―]+/g, "-")
+    .toLowerCase();
+}
+
+// 文字集合ベースのコサイン類似度（0〜1）
+// 参考サイト方式：特定の助詞・句読点は比較対象から除外
+function charSetSimilarity(a, b) {
+  const stop = ["を", "に", "が", "は", "、", "，", "。"];
+  const arrA = Array.from(a);
+  const arrB = Array.from(b);
+
+  // 和集合（比較対象文字の一覧）を作る。stop文字は集合に含めない。
+  const union = [];
+  for (const ch of arrA) if (!stop.includes(ch) && !union.includes(ch)) union.push(ch);
+  for (const ch of arrB) if (!stop.includes(ch) && !union.includes(ch)) union.push(ch);
+
+  if (union.length === 0) return 0;
+
+  let inA = 0, inB = 0, both = 0;
+  for (const ch of union) {
+    const hasA = arrA.includes(ch);
+    const hasB = arrB.includes(ch);
+    if (hasA) inA++;
+    if (hasB) inB++;
+    if (hasA && hasB) both++;
+  }
+  if (inA === 0 || inB === 0) return 0;
+  return both / (Math.sqrt(inA) * Math.sqrt(inB));
+}
+
+// 1つの設問を採点する
+// answer: 受験者の入力（正規化前）
+// correctList: 模範解答＋別解の配列
+// maxLen: 想定文字数上限
+function scoreAnswer(answer, correctList, maxLen) {
+  const userNorm = normalize(answer);
+  if (!userNorm) {
+    return { ratio: 0, similarity: 0, grade: "batu" };
+  }
+
+  let bestSim = 0;
+  for (const c of correctList) {
+    const sim = charSetSimilarity(userNorm, normalize(c));
+    if (sim > bestSim) bestSim = sim;
+  }
+
+  // 極端に短い解答への減点（想定文字数の半分未満の長さの場合）
+  if (maxLen / userNorm.length > 2) {
+    bestSim = bestSim / 4;
+  }
+
+  const pct = bestSim * 100;
+
+  // 段階式：90%以上=満点／60%以上=70%／30%以上=30%／それ未満=0点
+  let ratio, grade;
+  if (pct >= 90)      { ratio = 1.0; grade = "maru"; }
+  else if (pct >= 60) { ratio = 0.7; grade = "maru"; }
+  else if (pct >= 30) { ratio = 0.3; grade = "sankaku"; }
+  else                { ratio = 0.0; grade = "batu"; }
+
+  return { ratio, similarity: pct, grade };
+}
+
+/* ================= UI連携 ================= */
+
+document.querySelectorAll(".qa-item textarea").forEach(ta => {
+  const counter = ta.nextElementSibling;
+  const max = ta.getAttribute("maxlength");
+  ta.addEventListener("input", () => {
+    counter.textContent = ta.value.length + "/" + max;
+  });
+});
+
+document.getElementById("gradeBtn").addEventListener("click", () => {
+  const items = document.querySelectorAll(".qa-item");
+  let totalScore = 0, totalMax = 0;
+
+  items.forEach(item => {
+    const ta = item.querySelector("textarea");
+    const resultBox = item.querySelector(".result-box");
+    const points = parseInt(item.querySelector(".points-tag").textContent.match(/\d+/)[0], 10);
+    const maxLen = parseInt(item.getAttribute("data-maxlen"), 10);
+
+    const correctMain = item.getAttribute("data-answer");
+    const alt = item.getAttribute("data-alt") || "";
+    const correctList = [correctMain, ...alt.split("|").filter(Boolean)];
+
+    const { ratio, similarity, grade } = scoreAnswer(ta.value, correctList, maxLen);
+    const earned = Math.round(points * ratio);
+
+    totalScore += earned;
+    totalMax += points;
+
+    const labelText = grade === "maru" ? (ratio === 1.0 ? "正解" : "部分点")
+                     : grade === "sankaku" ? "部分点(小)"
+                     : "不正解";
+
+    resultBox.className = "result-box show " + grade;
+    resultBox.innerHTML =
+      `<div class="score-line"><span class="label">${labelText}</span>${earned} / ${points} 点　（類似度 ${similarity.toFixed(1)}%）</div>` +
+      `<div class="model-answer"><b>模範解答：</b>${correctMain}</div>`;
+  });
+
+  const summary = document.getElementById("scoreSummary");
+  summary.classList.add("show");
+  summary.innerHTML = `合計得点：<span>${totalScore}</span> / ${totalMax} 点`;
+
+  document.getElementById("gradeBtn").textContent = "採点済み（再採点する）";
+});
+
+/* =========================================================
+   マーカー機能
+   問題文（.mondai）内でマウス選択したテキストに
+   蛍光ペン風のハイライトを付ける。
+   - ドラッグで範囲選択 → ポップアップから色を選ぶ → <mark>で囲む
+   - 引いたマーカーをクリックすると消去（解除）される
+========================================================= */
+(function () {
+  const mondai = document.querySelector(".mondai");
+  const popup = document.getElementById("markerPopup");
+
+  // 選択範囲内に含まれる「テキストノード＋区間」の一覧を取得
+  function getIntersectingTextNodes(range) {
+    const root = range.commonAncestorContainer;
+    const container = root.nodeType === 3 ? root.parentNode : root;
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (range.intersectsNode(node)) nodes.push(node);
+    }
+    return nodes;
+  }
+
+  // テキストノードの [start, end) 部分だけを <mark> で包む
+  function wrapTextNodePortion(textNode, start, end, colorClass) {
+    let node = textNode;
+    if (end < node.data.length) node.splitText(end);
+    let middle = node;
+    if (start > 0) middle = node.splitText(start);
+    if (middle.data.length === 0) return; // 空文字は無視
+    const mark = document.createElement("mark");
+    mark.className = colorClass;
+    mark.title = "クリックでマーカーを消去";
+    middle.parentNode.insertBefore(mark, middle);
+    mark.appendChild(middle);
+  }
+
+  // 選択範囲全体にマーカーを適用
+  function highlightSelection(range, colorClass) {
+    const nodes = getIntersectingTextNodes(range);
+    nodes.forEach((node) => {
+      const start = node === range.startContainer ? range.startOffset : 0;
+      const end = node === range.endContainer ? range.endOffset : node.data.length;
+      if (start >= end) return;
+      wrapTextNodePortion(node, start, end, colorClass);
+    });
+  }
+
+  function hidePopup() {
+    popup.classList.remove("show");
+    popup.style.display = "none";
+  }
+
+  // 選択終了時：.mondai 内で範囲選択されていればポップアップを表示
+  document.addEventListener("mouseup", (e) => {
+    // ポップアップ自身の操作は除外
+    if (popup.contains(e.target)) return;
+
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+      hidePopup();
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    // 選択範囲が問題文（.mondai）に含まれているかを確認
+    if (!mondai.contains(range.commonAncestorContainer)) {
+      hidePopup();
+      return;
+    }
+
+    const rect = range.getBoundingClientRect();
+    popup.style.display = "flex";
+    popup.classList.add("show");
+    popup.style.left = window.scrollX + rect.left + rect.width / 2 - popup.offsetWidth / 2 + "px";
+    popup.style.top = window.scrollY + rect.top - popup.offsetHeight - 8 + "px";
+
+    // このタイミングの選択範囲を退避しておく（ポップアップクリックで消えるため）
+    popup.dataset.pendingRange = "1";
+    popup._range = range.cloneRange();
+  });
+
+  // 色ボタンクリックでマーカー適用
+  popup.querySelectorAll(".swatch").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (popup._range) {
+        highlightSelection(popup._range, btn.dataset.color);
+      }
+      window.getSelection().removeAllRanges();
+      hidePopup();
+    });
+  });
+
+  // 既存マーカーをクリックしたら解除
+  mondai.addEventListener("click", (e) => {
+    if (e.target.tagName === "MARK") {
+      const mark = e.target;
+      const parent = mark.parentNode;
+      while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+      parent.removeChild(mark);
+      parent.normalize();
+      e.stopPropagation();
+    }
+  });
+
+  // 選択も行わずに問題文外をクリックしたらポップアップを閉じる
+  document.addEventListener("mousedown", (e) => {
+    if (!popup.contains(e.target)) hidePopup();
+  });
+})();
+</script>
+
+</body>
+</html>
