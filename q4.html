@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問4 IT資産管理及び脆弱性管理｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .netbox{display:inline-block;border:1px solid #333;padding:4px 10px;margin:3px;border-radius:4px;background:#f5f7fa;font-size:0.85em;}
+  .mondai ol{margin:6px 0 6px 1.4em;padding:0;}
+  .mondai ol li{margin-bottom:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問4　IT資産管理及び脆弱性管理</h1>
+  <div class="meta">令和7年度 春期 情報処理安全確保支援士試験 午後問題　問4／全4設問</div>
+
+  <div class="mondai">IT資産管理及び脆弱性管理に関する次の記述を読んで，設問に答えよ。
+
+　V社は，従業員3,000名の製造業である。東京に本社，大阪，名古屋，福岡に支社がある。V社は，J事業部，K事業部，情報システム部（以下，情シ部という），総務部，経理部などから成る。
+　V社の社内システム及びネットワークの運用並びに情報セキュリティ管理は，情シ部のB部長とS主任を含む8名の部員が担当している。V社のネットワーク構成を図1に示す。
+
+<div style="text-align:center;margin:14px 0;">
+<b>V社本社</b><br>
+【DMZ】<span class="netbox">DNSキャッシュサーバ</span><span class="netbox">権威DNSサーバ</span><span class="netbox">公開Webサーバ</span><span class="netbox">プロキシサーバ</span><span class="netbox">メールサーバ</span><br>
+【サーバセグメント】<span class="netbox">会計システム</span><span class="netbox">人事システム</span><span class="netbox">ファイルサーバ</span>　【PCセグメント】<br>
+　　　　　　　　　　　　　　　　　　　　　　　　　⇕ UTM ⇕ インターネット<br>
+　　　　　　　　　　　　　　　　　　<span class="netbox">V社データセンター（データセンターセグメント，UTM）</span><br>
+　　　　　　　　　　　　　　　　　　<span class="netbox">V社支社（工場セグメント，PCセグメント，UTM）</span>
+</div>
+図1　V社のネットワーク構成
+
+　公開Webサーバでは，V社製品のキャンペーンなどを紹介している。V社本社と各支社及びV社データセンターの間はUTMのVPN機能を使用して通信を行っている。各支社には，UTMを除いてインターネットからアクセス可能なIT機器はない。
+　V社のIT資産管理，ドメイン名及びIPアドレスの管理，導入ソフトウェア（以下，ソフトウェアをSWという）の管理並びに脆弱性管理の現状を表1に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>項目</th><th>状況</th></tr>
+<tr><td>IT資産管理</td><td>
+1. IT資産管理台帳に対して，IT資産の登録，更新及び削除を行う。<br>
+2. IT資産管理台帳は，全社で共有されている。<br>
+3. インターネットからアクセス可能な全てのIT資産を公開IT資産と定義する。<br>
+4. IT資産管理台帳の管理項目には，資産ID，資産名称，取得金額，管理部門名，管理者名，公開IT資産かどうかの区分，及びその他特記事項を含める。また，公開IT資産の場合はグローバルIPアドレス（以下，GIPという）（注）及びドメイン名も含める。<br>
+5. IT資産管理台帳への登録は次のように行っている。(1)情シ部が購入するIT資産は，情シ部がIT資産管理台帳に登録する。(2)事業部がV社データセンター又はV社DMZにサーバを設置する場合は，情シ部に設置申請し，承認を得た後に設置する。情シ部は承認後IT資産管理台帳に登録する。(3)事業部が他社データセンター，クラウドサービス又はレンタルサービスを契約して，サーバなどを利用する場合については，IT資産管理台帳に登録していない。<br>
+6. IT資産は，年1回の棚卸しで管理部門が現物確認する。その際に，管理部門がIT資産管理台帳を更新する。IT資産の廃棄は管理部門が実施し，その際に，管理部門がIT資産管理台帳を更新する。
+</td></tr>
+<tr><td>ドメイン名及びIPアドレスの管理</td><td>
+1. V社データセンター及びV社本社で使用するIPアドレス及びドメイン名の管理は，次のように行っている。(1)情シ部が，“v-sha.co.jp”というドメイン名（以下，V社のドメイン名という）をレジストラのW社から取得し，V社データセンター，V社DMZなどにある公開IT資産に使用している。ドメイン名の使用料は情シ部が支払っている。JPRSが管理しているドメイン名の登録者情報の組織名にV社を，担当者情報の部署名に情シ部を，担当者名にS主任を登録している。(2)GIPは，ISPのR社から割り当てられている。GIPの使用料は，回線使用料と併せてR社に支払っている。JPNICの登録者情報の組織名にV社を，担当者情報の部署名に情シ部を，担当者名にS主任を登録している。(3)事業部がV社データセンター又はV社DMZにサーバなどを設置する場合は，情シ部にIPアドレス使用申請を行う。(4)事業部がV社のドメイン名を使用する場合は，情シ部にドメイン使用申請を行う。この際，情シ部は，必要なDNSレコードを登録している。<br>
+2. 事業部が他社データセンター，クラウドサービス又はレンタルサービスを契約し，新たなドメイン名を登録してサーバを利用する場合は，次のように行っている。(1)GIPは，各サービス会社から割り当てられたものを使用している。(2)ドメイン名は，各事業部が取得している。なお，使用するドメイン名は全て，トップレベルドメインが“.jp”のドメインを使用している。
+</td></tr>
+<tr><td>導入SWの管理</td><td>
+1. PCに導入するSWは，IT資産管理ツール（以下，AMツールという）で管理しており，IT資産管理台帳には登録せず，PCの“資産ID”をAMツールに入力して管理している。<br>
+2. ビジネス上，重要なサーバに導入するSWは，AMツールで管理している。ビジネス上，重要ではないサーバに導入するSWは，主なものをIT資産管理台帳の“その他特記事項”に記入している。
+</td></tr>
+<tr><td>脆弱性管理</td><td>
+1. サーバに導入したSWの脆弱性情報は，情シ部が脆弱性のニュースを毎日見て確認している。<br>
+2. 情シ部が，脆弱性のニュースで話題になった脆弱性情報全てを全部門に連絡している。<br>
+3. 連絡を受けた各部門が取捨選択し，必要に応じて対応している。
+</td></tr>
+</table>
+表1　V社のIT資産管理，ドメイン名及びIPアドレスの管理，導入SWの管理並びに脆弱性管理の現状（注：GIPはインターネットから当該IT資産にアクセスする時のGIP）
+
+　最近，次のようなサイバー攻撃のニュースが報道された。
+(1) CVE-20XX-XXXXXというWebサーバでの通信の暗号化に関する脆弱性が公表され，それを悪用した攻撃で，ある広告代理店に大きな被害が発生した。
+(2) 著名な会社が1年前，CDN事業者のサービスを利用してWebサーバを立ち上げ，1か月間商品のキャンペーンを行った。このWebサーバには，その会社のサブドメインを使用した。キャンペーン後すぐに，CDNサービスを解約したが，今になって，そのサブドメインが海外の会社の広告サイトとして使われていることが発覚した。
+(3) 競合他社で，不要になったにもかかわらず公開されたままとなっていたWebサーバが改ざんされ，フィッシングに悪用されていることが発覚した。
+
+　これらを受けて，V社の経営層は，V社でも対策が必要だと考え，対策の検討と実施を情シ部に指示した。(2)については，V社でも，CDN事業者のサービスを利用してWebサーバを立ち上げてキャンペーンを行った後，CDNサービスを解約した経緯があったので，緊急に確認した。その結果，問題があることが分かり，①図1中のサーバの設定を変更した。この事態も踏まえて，公開IT資産管理及び脆弱性管理を見直すことにした。
+
+〔公開IT資産管理及び脆弱性管理の目標の設定〕
+　情シ部のB部長とS主任は，まず，公開IT資産管理の現状を分析し，公開IT資産管理及び脆弱性管理の主な目標を表2にまとめた。
+
+<table class="small-table" style="width:100%;">
+<tr><th>目標</th><th>内容</th></tr>
+<tr><td>K-1</td><td>IT資産管理台帳に公開IT資産を漏れなく登録する。具体的には，次のようなケースの登録漏れをなくす。(1)事業部がクラウドサービスを契約して利用している公開IT資産（省略）</td></tr>
+<tr><td>K-2</td><td>情シ部が，サーバの導入SWを一元管理する。</td></tr>
+<tr><td>K-3</td><td>重要な脆弱性を事業部が修正したかどうかを情シ部が確認できるようにする。</td></tr>
+<tr><td>K-4</td><td>利用が終了した公開IT資産について，必要な措置を漏れなく行う。</td></tr>
+</table>
+表2　公開IT資産管理及び脆弱性管理の主な目標（抜粋）
+
+〔目標K-1の実現〕
+　まず，目標K-1について検討を行い，各事業部への未登録の公開IT資産の調査依頼を図2にまとめた。
+
+<div class="small-table" style="border:1px solid var(--border);padding:10px 14px;">
+次の未登録の公開IT資産を調査し，その一覧を回答すること<br>
+・クラウドサービスを契約して利用している公開IT資産：<span class="blank">a</span><br>
+・<span class="blank">b</span>：公開IT資産
+</div>
+図2　事業部への調査依頼
+
+次は，目標K-1の実現に関するB部長とS主任の会話である。
+
+B部長：事業部への調査依頼だけでは漏れが出そうだ。情シ部としても調査すべきだが，どのような方法があるのか。
+S主任：自分でインターネットをスキャンする方法（以下，オンアクセス型という）と，既に外部に構築されているデータベースを検索する方法（以下，検索エンジン型という）があります。
+B部長：どちらの方がよいだろうか。
+S主任：オンアクセス型では他社の環境に負荷を与える可能性があります。また，スキャンするには時間が掛かります。今回は検索エンジン型を使用したいと思います。
+B部長：分かった。検索エンジン型だと，具体的には，どのような方法があり，どのような情報が収集できるのかな。
+S主任：まず，IPアドレスの割当て，ドメイン名の登録などに関する情報をレジストラ又はレジストリに問い合わせることができます。そのための標準プロトコルとして，<span class="blank">c</span>が用意されており，RFC 3912で定義されています。次に，Webブラウザから利用できるサービスには，無償のものとして，ドメインの検索サービス（以下，Xサービスという）と，GIPの検索サービス（以下，Yサービスという）があります。その他，一部有償になりますが，Zサービスというサービスなどがあります。
+
+<table class="small-table" style="width:100%;">
+<tr><th>サービス</th><th>検索キーワード</th><th>検索可能な情報</th></tr>
+<tr><td rowspan="2">Xサービス</td><td>組織名</td><td>登録されているドメイン名</td></tr>
+<tr><td>ドメイン名／ネームサーバ名／ドメイン名の担当者識別番号</td><td>組織名，担当者識別番号，ネームサーバ名，登録・接続・最終更新日時，担当者名，メールアドレス，部署名，電話番号など</td></tr>
+<tr><td rowspan="2">Yサービス</td><td>GIP</td><td>組織名，GIPの担当者識別番号，ネームサーバ名，割当て・返却・最終更新日時など</td></tr>
+<tr><td>GIPの担当者識別番号</td><td>担当者名，メールアドレス，部署名，電話番号など</td></tr>
+<tr><td>Zサービス</td><td>ドメイン名，GIP，又は組織名</td><td>GIP，GIP割当て元の事業者名，FQDN，位置情報（国名，都市名，緯度・経度），ポート番号，OS，応答メッセージ情報（製品名やバージョン情報，デフォルトパスワードの使用など）</td></tr>
+</table>
+表3〜5　X／Y／Zサービスで検索可能な情報（抜粋・要約）
+
+B部長：当社が管理すべき公開IT資産をできるだけ多くリストアップしてほしい。
+S主任：事業部から提出されるリストと突合せができるように，当社が取得したGIP，ドメイン名，GIPの組織名，部署名及び担当者名，ドメイン名の組織名，部署名及び担当者名並びにFQDNを抽出してまとめたリスト（以下，Fリストという）を作成してみます。Fリストの作成手順を図3に示します。
+
+<table class="small-table" style="width:100%;">
+<tr><td>手順1</td><td><span class="blank">あ</span>サービスを用い，検索キーワードとして<span class="blank">d</span>を入力して，検索し，検索結果として<span class="blank">e</span>及び<span class="blank">f</span>を得る。</td></tr>
+<tr><td>手順2-1</td><td>手順1の結果を基に，<span class="blank">い</span>サービスを用い，検索キーワードとして<span class="blank">g</span>を指定して，検索し，検索結果として<span class="blank">g</span>の組織名及び<span class="blank">g</span>の<span class="blank">h</span>を得る。</td></tr>
+<tr><td>手順2-2</td><td>手順2-1の結果を基に，<span class="blank">い</span>サービスを用い，検索キーワードとして<span class="blank">g</span>の<span class="blank">h</span>を指定して，検索し，検索結果として<span class="blank">g</span>の部署名及び<span class="blank">g</span>の担当者名を得る。</td></tr>
+<tr><td>手順3-1</td><td>手順1の結果を基に，<span class="blank">う</span>サービスを用い，検索キーワードとして<span class="blank">f</span>を指定して，検索し，検索結果として<span class="blank">f</span>の組織名及び<span class="blank">f</span>の<span class="blank">h</span>を得る。</td></tr>
+<tr><td>手順3-2</td><td>手順3-1の結果を基に，<span class="blank">う</span>サービスを用い，検索キーワードとして<span class="blank">f</span>の<span class="blank">h</span>を指定して，検索し，検索結果として<span class="blank">f</span>の部署名及び<span class="blank">f</span>の担当者名を得る。</td></tr>
+<tr><td>手順4</td><td>得られた検索結果からFリストをまとめる。</td></tr>
+</table>
+（注記1）手順2-1〜3-2は，手順1で得られた検索結果のうち，“.jp”ドメインのものについて，それぞれ行う。（注記2）手順4では，Fリストの作成に必要な検索結果だけを選択する。
+図3　Fリストの作成手順
+
+〔V社の管理すべきIT資産の確認と管理の強化〕
+　事業部の提出した未登録の公開IT資産一覧とS主任の調査結果を突合したところ，幾つかFリストだけにあるもの（以下，調査漏れという）が見つかった。次は，B部長とS主任の会話である。
+
+B部長：どのような調査漏れが見つかったのか。
+S主任：調査漏れのリストは表6のとおりです。事業部からの説明では，古いケースで調査しきれなかったとのことでした。
+
+<table class="small-table" style="width:100%;">
+<tr><th>結果項番</th><th>GIP</th><th>GIPの部署名</th><th>ドメイン名の組織名</th><th>FQDN</th></tr>
+<tr><td>結果1</td><td>（省略）</td><td>V社G事業部</td><td>V社</td><td>sub1.v-sha-g.jp</td></tr>
+<tr><td>結果2</td><td>（省略）</td><td>V社H部</td><td>P協議会</td><td>（省略）</td></tr>
+</table>
+表6　調査漏れのリスト（抜粋）
+
+S主任：表6の結果1については，SSHでは接続できませんでしたが，公開サービスはWebだけが稼働しているようだということが，X，Y，Zサービス以外の②調査から分かりました。しかし，G事業部はもはや存在しません。調べたところ，K事業部が業務継承部門です。また，利用OSやSWもバージョンが古く，多くの脆弱性が内在しているようだということが，③別の調査から分かりました。
+攻撃を受けて被害が発生しないようにするために，④表6の結果1の公開IT資産を継続利用する場合としない場合のそれぞれの場合にK事業部が行うべき具体的な対応方法を伝えます。
+
+〔脆弱性管理の改善〕
+　次に，目標K-2及び目標K-3に対する実現方法を検討した。目標K-2については，S主任が必要なルールを決めた。次は，目標K-3の実現方法についてのB部長とS主任の会話である。
+
+B部長：目標K-2が実現できたとしても，次々発表される脆弱性に対して，対策の優先度などはどのように判断すればよいのか。
+S主任：脆弱性についての⑤CVSSの深刻度と⑥KEVカタログへの掲載の有無に基づいて判断するのがよいです。対策の優先度などの判断ルールを作成します。
+B部長：分かった。そのルールも踏まえ，目標K-3を実現するために，⑦表1の脆弱性管理の改善策を考えてほしい。
+S主任：分かりました。
+
+　さらに，目標K-4について，公開IT資産の利用終了時に行うべき措置をS主任がまとめた。
+　経営層に対応策を説明し，了承を得た。その後，B部長とS主任が作成したルールに従って，V社の公開IT資産管理及び脆弱性管理の運用が開始された。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　本文中の下線①について，設定を変更したサーバを，図1中から一つ選び，サーバ名を答えよ。また，その設定の変更内容を，30字以内で具体的に答えよ。</h2>
+  <div class="qa-item" data-points="14">
+    <div class="field-row" data-label="サーバ名" data-answer="権威DNSサーバ" data-alt="">
+      <textarea maxlength="15" placeholder="サーバ名"></textarea><span class="charcount">0/15</span>
+    </div>
+    <div class="field-row" data-label="変更内容" data-answer="終了したサブドメインのCNAMEレコードを削除する。" data-alt="">
+      <textarea maxlength="30" placeholder="30字以内"></textarea><span class="charcount">0/30</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔目標K-1の実現〕について答えよ。</h2>
+  <div class="qa-item" data-points="16">
+    <div class="q-text">(1) 図2中のa，bに入れる適切な内容を，それぞれ30字以内で答えよ。</div>
+    <div class="field-row" data-label="a" data-answer="レンタルサービスを契約して利用した公開IT資産" data-alt="">
+      <textarea maxlength="30" placeholder="30字以内"></textarea><span class="charcount">0/30</span>
+    </div>
+    <div class="field-row" data-label="b" data-answer="他社データセンターを契約して利用した公開IT資産" data-alt="">
+      <textarea maxlength="30" placeholder="30字以内"></textarea><span class="charcount">0/30</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(2) 本文中のcに入れる適切な字句を，英字10字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="WHOIS" data-alt="">
+      <textarea maxlength="10" placeholder="英字10字以内"></textarea><span class="charcount">0/10</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="9">
+    <div class="q-text">(3) 図3中のあ～うに入れる適切な文字を，X，Y，Zから選び答えよ。</div>
+    <div class="field-row" data-label="あ" data-answer="Z" data-alt=""><textarea maxlength="3" placeholder="あ"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="い" data-answer="X" data-alt=""><textarea maxlength="3" placeholder="い"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="う" data-answer="Y" data-alt=""><textarea maxlength="3" placeholder="う"></textarea><span class="charcount">0/3</span></div>
+  </div>
+  <div class="qa-item" data-points="15">
+    <div class="q-text">(4) 図3中のd～hに入れる適切な内容を，解答群の中から選び，記号で答えよ。<br>ア FQDN／イ GIP／ウ GIP割振り元の事業者名／エ OS／オ V社／カ 位置情報／キ 担当者識別番号／ク ドメイン名／ケ ポート番号／コ メールアドレス</div>
+    <div class="field-row" data-label="d" data-answer="オ" data-alt=""><textarea maxlength="3" placeholder="d"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="e" data-answer="ア" data-alt=""><textarea maxlength="3" placeholder="e"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="f" data-answer="イ" data-alt=""><textarea maxlength="3" placeholder="f"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="g" data-answer="ク" data-alt=""><textarea maxlength="3" placeholder="g"></textarea><span class="charcount">0/3</span></div>
+    <div class="field-row" data-label="h" data-answer="キ" data-alt=""><textarea maxlength="3" placeholder="h"></textarea><span class="charcount">0/3</span></div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔V社の管理すべきIT資産の確認と管理の強化〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 本文中の下線②について，調査方法を，40字以内で具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="ポートスキャンでWebのポートだけが開いていることを確認する。" data-alt="">
+      <textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線③について，調査方法を，40字以内で具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="脆弱性スキャナーを実行して，脆弱性の有無を確認する。" data-alt="">
+      <textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(3) 本文中の下線④について，二つの場合における主な対応方法を，それぞれ35字以内で具体的に答えよ。</div>
+    <div class="field-row" data-label="継続利用する場合" data-answer="一旦，サービスを停止し，脆弱性を修正後に再開する。" data-alt="">
+      <textarea maxlength="35" placeholder="35字以内"></textarea><span class="charcount">0/35</span>
+    </div>
+    <div class="field-row" data-label="継続利用しない場合" data-answer="速やかにネットワークから切り離し，機器を廃棄する。" data-alt="">
+      <textarea maxlength="35" placeholder="35字以内"></textarea><span class="charcount">0/35</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4　〔脆弱性管理の改善〕について答えよ。</h2>
+  <div class="qa-item" data-points="4">
+    <div class="q-text">(1) 本文中の下線⑤について，CVSSの最新のバージョン番号を，4字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="4.0" data-alt="">
+      <textarea maxlength="4" placeholder="4字以内"></textarea><span class="charcount">0/4</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="4">
+    <div class="q-text">(2) 本文中の下線⑥について，KEVカタログのフルスペルを，解答群の中から選び，記号で答えよ。<br>ア Key Exploited Vulnerabilities catalog／イ Key Exposure Vulnerabilities catalog／ウ Known Exploited Vulnerabilities catalog／エ Known Exposure Vulnerabilities catalog</div>
+    <div class="field-row" data-label="" data-answer="ウ" data-alt="">
+      <textarea maxlength="3" placeholder="記号"></textarea><span class="charcount">0/3</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(3) 本文中の下線⑥について，KEVカタログに掲載される脆弱性はどのようなものか。掲載される条件のうち主なものを，20字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="実際に悪用された。" data-alt="実際に悪用されたこと">
+      <textarea maxlength="20" placeholder="20字以内"></textarea><span class="charcount">0/20</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="16">
+    <div class="q-text">(4) 本文中の下線⑦について，表1の脆弱性管理の項番1，2の改善策を，項番1の改善策は60字以内で，項番2の改善策は40字以内でそれぞれ具体的に答えよ。</div>
+    <div class="field-row" data-label="項番1" data-answer="情シ部がIT資産管理台帳にあるSWについて，重要な脆弱性情報が発表されていないかを継続的に確認する。" data-alt="">
+      <textarea maxlength="60" placeholder="60字以内"></textarea><span class="charcount">0/60</span>
+    </div>
+    <div class="field-row" data-label="項番2" data-answer="該当SWを保有する管理部門に対策の優先度を連絡し，対策実施を確認する。" data-alt="">
+      <textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span>
+    </div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="assets/engine.js"></script>
+</body>
+</html>
