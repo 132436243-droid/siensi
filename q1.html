@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問1 サプライチェーンのリスク対策｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問1　サプライチェーンのリスク対策</h1>
+  <div class="meta">令和7年度 春期 情報処理安全確保支援士試験 午後問題　問1／全5設問</div>
+
+  <div class="mondai">サプライチェーンのリスク対策に関する次の記述を読んで，設問に答えよ。
+
+　L社は，金融業向けにシステムを開発している従業員1,000名の企業である。L社のシステム開発プロジェクトでは，プラットフォームGというソフトウェア開発プラットフォームを利用している。プラットフォームGの機能には，ソースコード及び開発ドキュメントのバージョンを管理する機能，CI/CDパイプラインの管理機能，開発対象のSBOM作成機能がある。CI/CDパイプラインの管理機能を利用してテストやリリースの自動実行が可能である。開発対象のSBOM作成機能はプラットフォームG上のリポジトリサーバ内のソースコード及びライブラリをシステム構成要素として一覧化する。開発対象のSBOM作成機能は現状では特に利用していない。また，L社が採用しているSASTツール（以下，ツールFという）は，プラットフォームG上のリポジトリサーバや開発者の端末にインストールして利用するツールであり，コンパイルエラーが解消されたソースコードに対してだけ正常な検査が可能である。プラットフォームGのCI/CDパイプラインの管理機能で，ツールFでのチェックを自動的に行うようなワークフローを構成することができる。
+
+　近年，業務委託先でのセキュリティ侵害に起因する情報セキュリティインシデントが大きく報道されるなど外部環境が変化し，L社経営陣もサプライチェーンリスク対策の強化を考えるようになった。経営陣の指示で，情報セキュリティ担当のBさんは，サプライチェーンリスク対策を強化したセキュリティガイドライン（以下，ガイドラインという）を作成し，全てのシステム開発プロジェクト及び運用サービスを点検することになった。Bさんは，L社が契約しているセキュリティコンサルタントで情報処理安全確保支援士（登録セキスペ）のD氏にガイドラインの作成について相談することにした。
+
+〔ガイドラインの作成〕
+　次は，ガイドラインの作成についてのBさんとD氏の会話である。
+
+Bさん：ガイドラインはどのような構成がよいでしょうか。
+D氏　：システムライフサイクルの工程に合わせるのがよいでしょう。L社のシステム開発業務を踏まえて，調達，開発，リリース・デプロイ，運用の工程に分類し，さらに全ての工程で共通するような項目も抜き出して記載しましょう。
+
+　Bさんは，ガイドライン案を表1のように作成した。
+
+<div class="img_margin">
+  <img src="img/q1_table1.png" alt="表1 ガイドライン案（抜粋）">
+  <figcaption>表1　ガイドライン案（抜粋）</figcaption>
+</div>
+
+　次は，ガイドライン案についてのBさんとD氏の会話である。
+
+Bさん：<u>①<span class="kakomi">1</span>セキュリティ・バイ・デザインの考え方を一部取り入れました。その他，留意すべき点などはありますか。</u>
+D氏　：項番5には，<u>②業務委託先が再委託を行う場合に備えて，L社と業務委託先との間の契約書に明記すべき事項を具体的に示しておくとよいでしょう。</u>
+
+　Bさんが修正したガイドライン案を経営陣に報告したところ，過去に外部ベンダーでのセキュリティ侵害に起因してL社でインシデントが何度か発生したことがあったので，それらのインシデントに対するガイドライン案の有効性を評価するように指示があった。
+
+〔過去のインシデントの確認〕
+　Bさんは，過去のインシデントに対するガイドライン案の有効性を評価することにした。次は，1件目のインシデントについてのD氏とBさんの会話である。
+
+D氏　：はじめに，インシデントの内容を確認しておきましょう。
+Bさん：L社が開発し，運用していたシステム（以下，システムQという）では，古いWebブラウザをサポートするためのJavaScript（以下，スクリプトPという）を利用していました。スクリプトPは，当時広く使われていたT社製のものです。スクリプトPは，T社が運営するサーバ（以下，サーバTという）に配置され，システムQにアクセスしたWebブラウザがスクリプトPを都度読み込むようにシステムQは構成されていました。ある日，サーバTが乗っ取られてしまい，スクリプトPが改ざんされたことによって，システムQへの利用者のアクセスが悪意のあるWebサイトにリダイレクトされてしまいました。
+D氏　：発見の経緯を教えてください。
+Bさん：システムQの利用者からの問合せで気付き，対策を実施しました。当時の情報セキュリティ担当は，サーバTが侵害されたというニュースは知っていましたが，システムQへのアクセスが影響を受けることを把握していませんでした。
+D氏　：他社の発表によると，<u>③スクリプトPを利用していたシステムでもスクリプトPの配置方法が違えば，影響を受けなかったようですね。</u>
+Bさん：はい。違う配置方法にするという対策もありました。しかし，Webブラウザ開発元での古いWebブラウザの公式サポートが終了していたことから，当社の対策としては，<u>④システムQのソースコードに変更を加えて，古いWebブラウザのサポートを終了しました。</u>
+D氏　：1件目のインシデントについてはおおむね理解できました。
+Bさん：案の項番10が，1件目のインシデントを未然に防ぐために有効ではありませんか。
+D氏　：いいえ，開発対象のSBOM作成機能でSBOMを作成していたとしても，スクリプトPはSBOMに含まれないので，インシデントは防げなかったでしょう。
+
+　Bさんは，<u>⑤SBOM以外の手段で，システムが利用している外部のスクリプトを把握できるよう，案の項目を一つ修正した。</u>D氏とともに，そのほかの過去のインシデントについても案を評価したところ，案は有効であると確認できたので，経営陣に報告して承認を得た。
+
+〔ガイドラインを用いた点検の実施〕
+　ガイドラインを用いて，現在進行中の全てのシステム開発プロジェクト及び運用サービスを点検することになった。最初の点検対象は，システムSの開発プロジェクト及び運用サービスである。Bさんがプロジェクト計画書，運用計画書などからまとめたシステムSの開発プロジェクト及び運用サービスの概要を図1に，開発環境の構成図を図2に示す。
+
+<div class="img_margin">
+  <img src="img/q1_zu1.png" alt="図1 システムSの開発プロジェクト及び運用サービスの概要">
+  <figcaption>図1　システムSの開発プロジェクト及び運用サービスの概要</figcaption>
+</div>
+<div class="img_margin">
+  <img src="img/q1_zu2.png" alt="図2 システムSの開発環境の構成図（抜粋）">
+  <figcaption>図2　システムSの開発環境の構成図（抜粋）</figcaption>
+</div>
+
+　Bさんは，システムSの担当者へのヒアリング前に論点を整理しておこうと考え，表1の各項番について，図1に基づき，対策状況を確認した。結果は表2のとおりである。
+
+<div class="img_margin">
+  <img src="img/q1_table2.png" alt="表2 システムSの事前確認結果（抜粋）">
+  <figcaption>表2　システムSの事前確認結果（抜粋）</figcaption>
+</div>
+
+　Bさんは，システムSの担当者であるCさんにヒアリングを行った。
+
+〔SBOMについての確認〕
+　次は，表1の項番10についてのCさんとBさんの会話である。
+
+Cさん：システムSのソフトウェア構成は設計書で把握できると考えていますが，SBOMの作成も必要でしょうか。
+Bさん：SBOMを利用すると，<u>⑥将来，脆弱性管理がしやすくなります。</u>プラットフォームGで作成することができます。
+Cさん：なるほど。それでは，SBOMの作成を検討します。
+
+〔開発工程のセキュリティ対策についての確認〕
+　Bさんは，表1の項番7，8について確認した。次は，そのときのBさんとCさんの会話である。
+
+Bさん：表1の項番7の対策は実施できていますか。
+Cさん：オフショア拠点から開発LANへのアクセスについてはVPN-GWでアクセスログを取得できているものの，社内からのアクセスについては取得できていません。
+Bさん：アクセスログは図2中の<span class="blank">d</span>で取得するのがよいでしょう。
+Cさん：分かりました。
+Bさん：表1の項番8の対策はどのようにしていますか。
+Cさん：現在はソースコードの変更内容を開発リーダーがレビューしています。
+Bさん：開発リーダーによるレビューに加えて，ツールFでチェックするのがよいでしょう。
+Cさん：開発フローのどこでツールFを実行するのがよいでしょうか。
+Bさん：ツールFの特性を踏まえると，図3のシステムSの開発フロー中の（あ）又は（い）で実行するのがよいと考えられます。<u>⑦それぞれ利点が異なります。</u>
+
+<div class="img_margin">
+  <img src="img/q1_zu3.png" alt="図3 システムSの開発フロー">
+  <figcaption>図3　システムSの開発フロー</figcaption>
+</div>
+
+　ガイドラインを用いた点検の後，L社のサプライチェーンリスク対策は強化された。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　〔ガイドラインの作成〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 本文中の下線①について，どのような考え方か答えよ。</div>
+    <div class="field-row" data-label="" data-answer="企画・設計工程からセキュリティ対策を組み込むという考え方" data-alt="" >
+      <textarea maxlength="60" placeholder="60字程度"></textarea><span class="charcount">0/60</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線②について，明記すべき事項を，50字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="L社の業務委託先に要求する対策と同等のセキュリティ対策を再委託先にも要求させること" data-alt="">
+      <textarea maxlength="50" placeholder="50字以内"></textarea><span class="charcount">0/50</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔過去のインシデントの確認〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 本文中の下線③について，影響を受けない配置方法を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="スクリプトPをダウンロードしておき，システムQのサーバ上に配置する方法" data-alt="">
+      <textarea maxlength="50" placeholder="50字程度"></textarea><span class="charcount">0/50</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線④について，加えた変更を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="スクリプトPを読み込む箇所をソースコードから削除する。" data-alt="">
+      <textarea maxlength="40" placeholder="40字程度"></textarea><span class="charcount">0/40</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(3) 本文中の下線⑤について，修正した項番と修正内容を答えよ。</div>
+    <div class="field-row" data-label="項番" data-answer="1" data-alt="項番1">
+      <textarea maxlength="5" placeholder="項番"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="修正内容" data-answer="連携している外部サービスを管理対象に含める。" data-alt="">
+      <textarea maxlength="30" placeholder="修正内容"></textarea><span class="charcount">0/30</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔ガイドラインを用いた点検の実施〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 表2中のア～エに入れる適切な項番を答えよ。</div>
+    <div class="field-row" data-label="ア" data-answer="10" data-alt="">
+      <textarea maxlength="5" placeholder="ア"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="イ" data-answer="4" data-alt="">
+      <textarea maxlength="5" placeholder="イ"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="ウ" data-answer="5" data-alt="">
+      <textarea maxlength="5" placeholder="ウ"></textarea><span class="charcount">0/5</span>
+    </div>
+    <div class="field-row" data-label="エ" data-answer="11" data-alt="">
+      <textarea maxlength="5" placeholder="エ"></textarea><span class="charcount">0/5</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="15">
+    <div class="q-text">(2) 表2中のa～cに入れる適切な字句を答えよ。</div>
+    <div class="field-row" data-label="a" data-answer="開発環境の踏み台サーバで共用アカウントを利用している。" data-alt="">
+      <textarea maxlength="40" placeholder="a"></textarea><span class="charcount">0/40</span>
+    </div>
+    <div class="field-row" data-label="b" data-answer="問題なし。" data-alt="問題ない">
+      <textarea maxlength="15" placeholder="b"></textarea><span class="charcount">0/15</span>
+    </div>
+    <div class="field-row" data-label="c" data-answer="問題なし。" data-alt="問題ない">
+      <textarea maxlength="15" placeholder="c"></textarea><span class="charcount">0/15</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">本文中の下線⑥について，脆弱性管理がしやすくなる理由を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="利用しているソフトウェアやそのバージョンが明確になり，脆弱性の影響有無を容易に把握できるから" data-alt="">
+      <textarea maxlength="55" placeholder="55字程度"></textarea><span class="charcount">0/55</span>
+    </div>
+  </div>
+
+  <!-- ========== 設問5 ========== -->
+  <h2 class="setumon">設問5　〔開発工程のセキュリティ対策についての確認〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 本文中のdに入れる適切な字句を，図2中の名称で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="踏み台サーバ" data-alt="">
+      <textarea maxlength="15" placeholder="15字以内"></textarea><span class="charcount">0/15</span>
+    </div>
+  </div>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(2) 本文中の下線⑦について，（あ），（い）で実行する利点を，それぞれ40字以内で答えよ。</div>
+    <div class="field-row" data-label="（あ）" data-answer="ツールFで検知できるエラーをより早く発見することができる。" data-alt="">
+      <textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span>
+    </div>
+    <div class="field-row" data-label="（い）" data-answer="CI/CDパイプラインの管理機能を使って自動実行することができる。" data-alt="">
+      <textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span>
+    </div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 表・図は画像ファイル（img/q1_*.png）として別途配置してください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="assets/engine.js"></script>
+</body>
+</html>
