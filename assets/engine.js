@@ -50,11 +50,7 @@ function scoreAnswer(answer, correctList, maxLen) {
     if (sim > bestSim) bestSim = sim;
   }
 
-  // 極端に短い解答への減点
-  if (maxLen && maxLen / userNorm.length > 2) {
-    bestSim = bestSim / 4;
-  }
-
+  
   const pct = bestSim * 100;
 
   // 段階式：90%以上=満点／60%以上=70%／30%以上=30%／それ未満=0点
