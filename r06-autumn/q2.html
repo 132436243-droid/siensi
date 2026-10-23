@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問2 ドメイン名変更｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問2　ドメイン名変更</h1>
+  <div class="meta">令和6年度 秋期 情報処理安全確保支援士試験 午後問題　問2／全10設問</div>
+
+  <div class="mondai">ドメイン名変更に関する次の記述を読んで，設問に答えよ。
+
+　A社は，従業員1,000名の工作機械製造会社である。A社の技術力は高く評価されている。A社には，総務部，営業部，情報システム部，技術部及び製造部がある。
+　A社のWebサイトでは，一般向けにIR情報と関連会社へのリンクを，顧客向けに自社製の工作機械管理用アプリケーションプログラムとそのソフトウェア修正プログラムを提供している。また，A社では，電子メール（以下，メールという）を用いて，顧客との間で見積書や注文書の送受信をしたり，ニュースサイトのメールマガジンに登録して最新の情報を収集したりしている。
+　A社のドメイン名を詐称したメールが毎週2通程度，送られていることが，多くの顧客から報告されている。情報システム部長は，顧客に詐欺などの被害が生じるおそれがあることを認識し，メールの詐称対策が必要であると考えている。
+
+〔情報システムの現状〕
+　A社は，10年前にドメイン名a-sha.co.jp（以下，A社ドメイン名という）を取得して以降，A社のWebサイト（以下，A-Webサイトという）及びメールアドレスのドメイン名として利用している。A社ドメイン名は，DNSサービス事業者であるS社の権威DNSサービス（以下，Sサービスという）を用いて管理している。
+　A-Webサイトは，Webサービス事業者であるW社のWebサービス（以下，Wサービスという）を用いて提供している。
+　A社のネットワークを図1に，構成要素の機能を表1に示す。A社の従業員は，PC-LAN内のPCで業務を行っている。
+
+<div class="diag">Wサービス ─ インターネット ─ キャッシュDNSサービス，Sサービス
+インターネット ─ FW（A社）
+【A社】 DMZ：メールサーバ ─ ファイアウォール ─ PC-LAN
+　　　　　　　　　　　　　　　　　　　　　└ サーバLAN：レイヤー2スイッチ ─ 業務サーバ（複数）
+注記　PC-LAN内のPCの記載は省略している。</div>
+図1　A社のネットワーク（抜粋）
+
+<table class="small-table" style="width:100%;">
+<tr><th>構成要素</th><th>機能</th></tr>
+<tr><td>メールサーバ</td><td>・S社が提供するキャッシュDNSサービスを用いて，DNS問合せを行う。
+・インターネットとの間で，SMTPを用いてメールを転送する。
+・PC-LAN及び業務サーバからSMTPを用いて送信されるメールを受信する。
+・宛先メールアドレスのドメイン名が <span class="blank">a</span> であるメールをメールボックスに格納する。
+・第三者中継防止のためのルールを用いて，第三者中継を防止する。第三者中継防止のためのルールを表2に示す。
+・メールボックス内のメールを，PC-LAN内のPCがPOP3を用いて受信できるようにする。</td></tr>
+</table>
+表1　構成要素の機能（抜粋）
+
+<table class="small-table" style="width:100%;">
+<tr><th>項番</th><th>転送元</th><th>宛先メールアドレスのドメイン名</th><th>転送処理</th></tr>
+<tr><td>1</td><td>インターネット</td><td><span class="blank">a</span></td><td>許可</td></tr>
+<tr><td>2</td><td>PC-LAN</td><td><span class="blank">b</span></td><td>許可</td></tr>
+<tr><td>3</td><td>業務サーバ</td><td>A社ドメイン名</td><td>許可</td></tr>
+<tr><td>4</td><td>全て</td><td>全て</td><td>拒否</td></tr>
+</table>
+表2　第三者中継防止のためのルール
+注記　項番が小さいルールから順に，最初に一致したルールが適用される。
+
+〔ドメイン名の変更についての検討〕
+　A社は，3か月後にZ社への社名変更を予定している。情報システム部長は，メールの詐称対策の導入及び社名変更に合わせたドメイン名変更を検討するように情報システム部のN主任に指示した。N主任は情報システム部のEさんと，次のとおり検討した。
+・z-sha.co.jp（以下，Z社ドメイン名という）が過去に取得されたことがないドメイン名であることを確認してから取得する。
+・Z社ドメイン名の管理もSサービスで行う。
+・WサービスでZ社ドメイン名のWebサイト（以下，Z-Webサイトという）も立ち上げる。
+・図1のメールサーバでは，複数のドメイン名のメールを受信できないことから，商用のメールサービスに移行する。
+・メールの詐称対策は，SPF，DKIM及びDMARCで対応する。
+　N主任とEさんは，Z社が送信するメールの詐称対策（以下，送信対応という）と，Z社が受信するメールの詐称対策（以下，受信対応という）について方針をそれぞれ表3と表4のとおり作成した。
+
+<table class="small-table" style="width:100%;">
+<tr><th>項番</th><th>対応方針概要</th></tr>
+<tr><td>1</td><td>送信するメールのエンベロープFrom及びヘッダーFromのドメイン名をZ社ドメイン名とする。</td></tr>
+<tr><td>2</td><td>Z社ドメイン名のメールを受信した側でSPFによる認証及びDKIMによる認証に失敗した場合のアクションをDMARCポリシーとして定義する。</td></tr>
+<tr><td>3</td><td>DMARCポリシーレコード（以下，DMARCレコードという），SPFレコード及びDKIMキーレコード（以下，DKIMレコードという）をSサービスに登録する。</td></tr>
+<tr><td>4</td><td>送信するメールには，DKIM署名を付与する。</td></tr>
+<tr><td>5</td><td>DMARCレポートを分析する。</td></tr>
+<tr><td>6</td><td>顧客に，Z社は送信するメールについて，SPF，DKIM及びDMARCに対応済みであることを周知する。</td></tr>
+</table>
+表3　送信対応方針
+
+<table class="small-table" style="width:100%;">
+<tr><th>項番</th><th>対応方針概要</th></tr>
+<tr><td>1</td><td>受信するメールの宛先メールアドレスのドメイン名は，Z社ドメイン名とする。</td></tr>
+<tr><td>2</td><td>顧客に，送信するメールについてSPF，DKIM及びDMARCに対応するように依頼する。</td></tr>
+<tr><td>3</td><td>SPFによる認証及びDKIMによる認証を行いそのいずれかが成功した場合，DMARCの認証が成功したものと判断し，受信する。</td></tr>
+<tr><td>4</td><td>送信元のDMARCポリシーに基づき，メールの受信，隔離又は拒否を行う。</td></tr>
+</table>
+表4　受信対応方針
+
+　N主任とEさんは，これまでの結果を，情報システム部長に報告し，了承を得た。
+
+〔メールサービスの機能の検討〕
+　N主任とEさんは，メールサービスの機能について検討し，メールサービス事業者であるU社のメールサービス（以下，Uサービスという）に移行することにした。Uサービスの機能の概要を表5に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>機能</th><th>概要</th></tr>
+<tr><td>メール転送</td><td>・インターネットとの間は，SMTPをTLSで暗号化する <span class="blank">c</span> を使用してメールを転送することができる。</td></tr>
+<tr><td>Webメール</td><td>・Webブラウザを用いてメールを送受信する。</td></tr>
+<tr><td>Uサービス管理Web</td><td>・利用者アカウントの登録や削除を行う。
+・送信したメールについてDMARCレポートの分析結果を参照することができる。</td></tr>
+</table>
+表5　Uサービスの機能の概要（抜粋）
+
+〔Z-Webサイト及びUサービスへの移行手順の検討〕
+　Eさんは，Z-Webサイト及びUサービスへの移行手順を検討した。検討結果を，図2及び図3にそれぞれ示す。
+
+<div class="fbox">Web-Step1：A-Webサイトのコンテンツを全て，Z-Webサイトに同一構成で配置する。Z-Webサイトに配置したコンテンツ中のA社ドメイン名をZ社ドメイン名に書き換える。
+Web-Step2：次を1年間，実施する。
+・A-WebサイトへのアクセスをZ-Webサイトのトップページにリダイレクトする。
+Web-Step3：A-Webサイトを停止する。A-Webサイト用のDNSレコードは削除する。</div>
+図2　Z-Webサイトへの移行手順
+
+<div class="fbox">Mail-Step1：試行期間として次を1か月間，実施する。
+・総務部及び情報システム部のメンバーだけが，Z社ドメイン名のメールアドレスを使用する。
+・送信対応では，DMARCポリシーを，特定のアクションを要求しないこととし，メールを受信してもらう。
+・受信対応では，DMARCの認証結果にかかわらず受信する。
+Mail-Step2：図1のメールサーバの利用をやめ，次を3か月間，実施する。
+・Z社全体が，Uサービスを用いてZ社ドメイン名のメールアドレスを使用する。
+・Z社ドメイン名でのメールの利用を顧客に文書で周知するとともに，Z-Webサイトで周知する。
+・A社ドメイン名宛てのメールをUサービスで受信する。
+Mail-Step3：送信対応のDMARCポリシーを隔離に変更し，その6か月後，拒否に変更する。
+Mail-Step4：A社ドメイン名でのメールの受信を停止する。メールサーバ用のDNSレコードは削除する。
+Mail-Step5：問題がないと確認できたら，受信対応でDMARCの処理を行う。</div>
+図3　Uサービスへの移行手順
+
+　Eさんは，図2及び図3をN主任に説明し，了承を得た。
+
+〔送信対応の設定内容についての検討〕
+　Eさんは，送信対応に用いるSPFレコードを，Uサービスから提供された情報に基づいて作成した。
+　次に，Eさんは，送信対応に用いるDKIMレコードについて検討した。Z社がUサービスを利用した場合，送信されるメールに付与されるDKIM-Signatureヘッダーのタグの内容を表6に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>タグ</th><th>内容</th></tr>
+<tr><td>v</td><td>1</td></tr>
+<tr><td>a</td><td>rsa-sha256</td></tr>
+<tr><td>d</td><td>z-sha.co.jp</td></tr>
+<tr><td>h</td><td>From:To:Subject:Date:Message-ID:MIME-Version</td></tr>
+<tr><td>s</td><td>z2024</td></tr>
+</table>
+表6　タグの内容（抜粋）
+
+　表6から，<u>①DKIMレコードの名称として使用するFQDN</u>が決まる。Eさんは，Uサービスから提供された情報に基づきDKIMレコードを作成した。
+　最後に，Eさんは，Mail-Step1の送信対応ではDMARCレコードを図4のとおりとすることにした。
+
+<div class="fbox">v=DMARC1; p=<span class="blank">d</span>; rua=mailto:rua-report@z-sha.co.jp</div>
+図4　DMARCレコード
+
+　Eさんは，設定内容をまとめてN主任に報告し，了承を得た。
+
+〔A社ドメイン名の契約についての検討〕
+　N主任とEさんは，A社ドメイン名使用の契約を継続するか解約するかについて検討した。解約した場合，第三者がA社ドメイン名を取得することができる。N主任とEさんは，第三者がA社ドメイン名を取得した場合のA社ドメイン名の悪用例を検討し，表7のとおりまとめた。
+
+<table class="small-table" style="width:100%;">
+<tr><th>項目</th><th>悪用の例</th></tr>
+<tr><td>Webの悪用</td><td>第三者が，A社ドメイン名を用いて，現在のA-Webサイトと見た目が同じWebサイトを立ち上げるという悪用が考えられる。さらに，第三者が，コンテンツを細工してWebサイトの見た目を変えずに<u>②顧客に影響を及ぼす攻撃</u>をすることが考えられる。</td></tr>
+<tr><td>メールの送信</td><td>第三者が，メールサーバを立ち上げ，A社ドメイン名のメールアドレスを送信元メールアドレスとしてメールを送信するという悪用が考えられる。</td></tr>
+<tr><td>メールの受信</td><td>従業員が業務で用いる社外サービスがあり，メールでの連絡先として，A社ドメイン名のメールアドレスを登録していたとする。もし連絡先の変更を忘れてしまうと，<u>③第三者が，社外サービスからA社ドメイン名のメールアドレスへのメールを受信し，そのメールを使って続きの攻撃を行う</u>という悪用が考えられる。</td></tr>
+</table>
+表7　A社ドメイン名の悪用例
+
+　N主任とEさんは，A社ドメイン名使用の契約を継続することを情報システム部長に報告し，承認を得た。
+　また，A社ドメイン名については，Mail-Step4の後で次のとおり，設定することにした。
+・DMARCレコードを設定する。
+・DMARCの受信対応を行った組織がA社ドメイン名からのメールを拒否できるようにする。
+　そのために，A社ドメイン名について，SPFレコードを図5のように設定する。DKIMレコードは設定しない。
+
+<div class="fbox">v=spf1 <span class="blank">e</span></div>
+図5　SPFレコード
+
+〔Uサービスへの移行の見直し〕
+　Mail-Step1において，DMARCレポートの分析結果を参照した結果，送信対応には問題がないことが確認できた。
+　Mail-Step2の開始1週間後，情報システム部のEさんに営業部のHさんから，図6に示すメールの一斉配信をしても問題ないか相談があった。
+
+<div class="fbox">1. 定期的に，Z社の公式情報の周知のためのメールを一斉配信する。
+2. 宛先には，社内と社外のメールアドレスが含まれている。
+3. 一斉配信には，T社のサービス（以下，Tサービスという）を利用する計画であり，Tサービスの仕様は次のとおりである。
+ ・配信方法
+  - 宛先メールアドレスは，サービス契約者が登録できる。
+  - 宛先メールアドレスごとに個別に送信する。
+ ・メールのヘッダーの設定
+  - Fromは，サービス契約者が所属する組織が保有するドメイン名を用いたメールアドレスだけを設定できる。
+  - Toは，宛先のメールアドレスから一つずつ，Tサービスが設定する。
+  - Subjectは，一斉配信の都度，サービス契約者が設定する。
+  - 他のヘッダーは，Tサービスが設定する。</div>
+図6　メールの一斉配信の説明
+
+　Eさんから相談を受けたN主任は，図6の一斉配信メールについて，次のとおりEさんに説明した。
+・Mail-Step3以降で，一斉配信されたメールが届かない場合がある。メールが届くように，Mail-Step2の期間で，<u>④表3の項番3での登録内容を見直す</u>必要がある。
+　Eさんは，見直し案を作成し，N主任の了承を得てから，Hさんに問題ないことを説明した。
+　Mail-Step2の開始2週間後，情報システム部に技術部のJさんから，図7に示すメーリングリストを新たに利用することが可能か相談があった。
+
+<div class="fbox">1. 使用するメーリングリストは一つである。
+2. メーリングリストの管理者は，Z社従業員である。
+3. 製品に関する情報交換のために，メーリングリストを使用する。
+4. メーリングリストの配信先となる宛先には，社内及び社外のメールアドレスを登録する（以下，登録されたメールアドレスを登録メンバーという）。
+5. 登録メンバーから，メーリングリスト宛てにメールを送信できる。
+6. メールサービス事業者であるY社のサービス（以下，Yサービスという）を利用する計画であり，Yサービスの仕様は次のとおりである。
+ (1) メーリングリストのメールアドレスは，サービス契約者ごとに割り当てられたYサービスのメールアドレスである。ドメイン名はY社のドメイン名である。
+ (2) Yサービスの管理画面で設定できる項目は(3)～(6)であり，配信されるメールに反映される。
+ (3) エンベロープFromの設定
+  ・メーリングリストの管理者のメールアドレスを設定する。
+ (4) ヘッダー-Fromの設定
+  ・次のいずれかを選択する。
+   ヘッダー-From設定1：メーリングリスト宛てに送信されたメールのヘッダー-Fromを使用する。
+   ヘッダー-From設定2：メーリングリストのメールアドレスを使用する。
+ (5) Subjectの設定
+  ・次のいずれかを選択する。
+   Subject設定1：メーリングリスト宛てに送信されたメールのSubjectを使用する。
+   Subject設定2：メーリングリスト宛てに送信されたメールのSubjectにメールの通番情報を付加する。
+ (6) Reply-Toの設定
+  ・メーリングリストのメールアドレスを設定する。
+ (7) ヘッダー-From，Subject及びReply-To以外のヘッダー
+  ・メーリングリスト宛てに送信したメールのヘッダーを引き継ぐ。
+ (8) Authenticated Received Chain（注）（ARC）について
+  ・ARCには，対応していない。
+注）メールが転送される場合でも，メールの認証結果を確認できるようにする仕組みとして，RFC 8617に定義されている。</div>
+図7　メーリングリストの説明
+
+　N主任は，Eさんに図8に示すとおり説明した。
+
+<div class="fbox">・Mail-Step3以降にZ社の従業員が送信したメールについて
+ - ヘッダー-From設定1とSubject設定1の組合せでは，不達の問題は起きない。
+ - ヘッダー-From設定1とSubject設定2の組合せでは，<u>⑤SPFによる認証及びDKIMによる認証の両方に失敗することによって不達の問題が発生することがある</u>。
+ - ヘッダー-From設定2については，Z社の従業員が送信したメールであるかどうかの判定ができないので，用いるべきではない。
+・Mail-Step3以降にZ社の従業員以外が送信したメールについて
+ （省略）</div>
+図8　N主任の説明
+
+　N主任とEさんは，Jさんには，ヘッダー-From設定1とSubject設定1の組合せを用いるよう説明した。
+　その後，Z-Webサイト及びUサービスへの移行は，順調に進み，完了した。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　〔情報システムの現状〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 表1中及び表2中の a に入れる適切な字句を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="A社ドメイン名" data-alt="a-sha.co.jp"><textarea maxlength="14" placeholder="字句"></textarea><span class="charcount">0/14</span></div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(2) 表2中の b に入れる適切な字句を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="全て" data-alt=""><textarea maxlength="5" placeholder="字句"></textarea><span class="charcount">0/5</span></div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　表5中のcに入れる適切な字句を英字10字以内で答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="field-row" data-label="" data-answer="STARTTLS" data-alt="SMTPS"><textarea maxlength="10" placeholder="英字10字以内"></textarea><span class="charcount">0/10</span></div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔送信対応の設定内容についての検討〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 本文中の下線①のFQDNを解答群の中から選び，記号で答えよ。<br>ア rsa-sha256._dkim.z-sha.co.jp／イ rsa-sha256._domainkey.z-sha.co.jp／ウ z2024._dkim.z-sha.co.jp／エ z2024._domainkey.z-sha.co.jp／オ z2024.z-sha.co.jp</div>
+    <div class="field-row" data-label="" data-answer="エ" data-alt=""><textarea maxlength="3" placeholder="記号"></textarea><span class="charcount">0/3</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(2) 図4中の d に入れる適切な字句を解答群の中から選び，記号で答えよ。<br>ア accept／イ none／ウ quarantine／エ receive／オ reject</div>
+    <div class="field-row" data-label="" data-answer="イ" data-alt=""><textarea maxlength="3" placeholder="記号"></textarea><span class="charcount">0/3</span></div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4　〔A社ドメイン名の契約についての検討〕について答えよ。</h2>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(1) 表7中の下線②について，攻撃の方法を具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="顧客向けのソフトウェア修正プログラムを，マルウェアを含むものに差し替えて配布し，顧客にダウンロード・実行させる。" data-alt="ソフトウェア修正プログラムをマルウェアに差し替える。|ログイン画面を装い，顧客が入力した情報を窃取する。"><textarea maxlength="60" placeholder="60字程度"></textarea><span class="charcount">0/60</span></div>
+  </div>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(2) 表7中の下線③について，受信するメールの内容及び続きの攻撃の例を具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="社外サービスのパスワード再設定用URLが記載されたメールを受信し，そのURLからパスワードを再設定してアカウントを乗っ取る。" data-alt="パスワード再設定のメールを受信して，従業員のアカウントに不正ログインする。"><textarea maxlength="73" placeholder="60字程度"></textarea><span class="charcount">0/73</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(3) 図5中の e に入れる適切な字句を解答群の中から選び，記号で答えよ。<br>ア -all／イ ?all／ウ block／エ deny／オ refuse</div>
+    <div class="field-row" data-label="" data-answer="ア" data-alt=""><textarea maxlength="3" placeholder="記号"></textarea><span class="charcount">0/3</span></div>
+  </div>
+
+  <!-- ========== 設問5 ========== -->
+  <h2 class="setumon">設問5　〔Uサービスへの移行の見直し〕について答えよ。</h2>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(1) 本文中の下線④について，見直しの内容を具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="SPFレコードにTサービスの送信元を追加し，TサービスのDKIM署名用の鍵をDKIMレコードとして登録する。" data-alt="TサービスのSPF・DKIMの情報をSサービスに登録する。"><textarea maxlength="60" placeholder="60字程度"></textarea><span class="charcount">0/60</span></div>
+  </div>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(2) 図8中の下線⑤について，SPFによる認証に失敗する理由及びDKIMによる認証に失敗する理由をそれぞれ，Sサービスへの登録内容とYサービスの仕様を含めて，具体的に答えよ。</div>
+    <div class="field-row" data-label="SPF" data-answer="Yサービスのサーバから送信されるが，その送信元IPアドレスがSサービスに登録したZ社ドメイン名のSPFレコードに含まれていないから。" data-alt=""><textarea maxlength="70" placeholder="SPFが失敗する理由"></textarea><span class="charcount">0/70</span></div>
+    <div class="field-row" data-label="DKIM" data-answer="Subject設定2で通番情報が付加されてSubjectが変更され，署名対象のSubjectを含む署名の検証に失敗するから。" data-alt=""><textarea maxlength="70" placeholder="DKIMが失敗する理由"></textarea><span class="charcount">0/70</span></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。ネットワーク構成図などは文字による簡易表現です。<br>
+    ※ <b>模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。</b>採点後は，IPAが公表している解答例・採点講評と見比べてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="../assets/engine.js"></script>
+</body>
+</html>
