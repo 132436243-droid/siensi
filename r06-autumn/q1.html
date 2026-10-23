@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問1 インシデントレスポンス｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問1　インシデントレスポンス</h1>
+  <div class="meta">令和6年度 秋期 情報処理安全確保支援士試験 午後問題　問1／全9設問</div>
+
+  <div class="mondai">インシデントレスポンスに関する次の記述を読んで，設問に答えよ。
+
+　L社は，従業員100名のソフトウェア開発会社である。L社の社内システムは，情報システム部（以下，情シス部という）が，運用及びインシデント対応を行っている。
+　L社は，E社のSaaSを使用している。L社のネットワーク構成を図1に，図1の各構成要素の仕様，機能及び利用方法を表1に示す。
+
+<div class="diag">【E社SaaS】 プロキシサービス／マルウェア対策サービス／メールサービス／DNSサービス
+【L社】 インターネット ─ FW ─ L3SW
+  L3SWの配下：
+  ・オフィスLAN：AP，L2SW，シンクライアントPC（複数）
+  ・仮想環境LAN：L2SW ─ 仮想環境（仮想スイッチ，仮想PC（複数））
+  ・サーバLAN：L2SW ─ ドメインサーバ，ファイルサーバ
+  ・サポートLAN：L2SW ─ バックアップサーバ，保守用PC
+FW：ファイアウォール　L2SW：レイヤー2スイッチ　L3SW：レイヤー3スイッチ　AP：無線LANアクセスポイント
+仮想環境：物理サーバ上で仮想スイッチと複数の仮想PCを稼働させる環境</div>
+図1　L社のネットワーク構成（抜粋）
+
+<table class="small-table" style="width:100%;">
+<tr><th>構成要素</th><th>仕様，機能及び利用方法</th></tr>
+<tr><td>ドメインサーバ</td><td>・ドメイン名ad01というL社の社内ドメインを管理する。
+・L社の各従業員には一つのドメインユーザーが割り当てられている。
+・ドメインユーザーが登録されており，プロキシサービス，メールサービス，L社内のサーバ，仮想PC及び保守用PC（以下，L社内のサーバ，仮想PC及び保守用PCをL社内ホストという）にログオンする際の利用者認証に利用される。
+・ログオンは，ドメインユーザーの利用者IDとパスワードで行う。</td></tr>
+<tr><td>プロキシサービス</td><td>・専用のプログラム（以下，Qプログラム（注1）という）をL社内ホストにインストールする必要がある。Qプログラムがドメインサーバに接続され，ドメインユーザーが認証されると，利用可能になる。
+・QプログラムがインストールされたL社内ホストからインターネットへのHTTP通信及びHTTPS通信を全て中継する。
+・HTTPS通信を復号してURLフィルタリング機能を適用し，再暗号化することができる。
+・URLフィルタリング機能では，ドメインユーザーごとに指定されたURLへのアクセスを許可又は拒否することができる。
+ - 次の3種類のリストがあり，上から順にURLフィルタリングが適用される。
+  ・管理者許可リスト：管理者が設定できる。アクセスが許可されるURLのリストである。“全て”と記載すると，全てのURLへのアクセスが許可される。何も設定しないとリストは無視される。
+  ・管理者拒否リスト：管理者が設定できる。アクセスが拒否されるURLのリストである。“全て”と記載すると，全てのURLへのアクセスが拒否される。何も設定しないとリストは無視される。設定されたURLへのアクセスが拒否されたときは，情シス部にアラートメールが送付されるように設定している。
+  ・ベンダー拒否リスト：E社から日次で提供される。アクセスが拒否されるURLのリストであり，マルウェア感染などのカテゴリがある。アクセスが拒否されたURLがマルウェア感染のカテゴリに一致したときは，情シス部にアラートメールが送付されるように設定している。
+ - どのリストにも該当しない場合は，アクセスは許可される。
+・管理用のWebページから，各種設定の変更と通信ログの確認ができる。</td></tr>
+<tr><td>マルウェア対策サービス</td><td>・L社内ホストに導入しているマルウェア対策ソフトを管理する。
+・管理用のWebページから，各種設定の変更，マルウェア定義ファイルの適用状況の確認，マルウェア対策ソフトの稼働状況の確認及びマルウェア検知のログの確認ができる。
+・マルウェアが検知されたときは，情シス部にアラートメールが送付される。</td></tr>
+<tr><td>仮想PC</td><td>・L社の従業員には，一人1台割り当てられている。
+・従業員がシンクライアントPCからRDPで接続して利用する。
+・従業員が利用するアカウントは，ドメインユーザーであり，仮想PC上のローカルアドミニストレーター権限をもっている。
+・各ドメインユーザーは，割り当てられた仮想PCにだけログオンできる。
+・ホスト名はPC-x（注2）である。
+・マルウェア感染が確認された場合，情シス部が仮想環境の仮想スイッチから切り離し，感染拡大を防ぐ。</td></tr>
+<tr><td>ファイルサーバ</td><td>・L社の顧客情報，設計書など，社外秘に指定されている情報（以下，社外秘情報Lという）を保管する。
+・社外秘情報Lは，仮想PCには保管せず，ファイルサーバに保管するルールにしている。
+・利用時はドメインサーバでの認証が必要である。
+・ホスト名はfilesvである。</td></tr>
+<tr><td>保守用PC</td><td>・L社内のサーバと仮想PCを保守するための専用のPCである。インシデント発生時は本PCで調査を行う。
+・保守用ツールのほか，ネットワークトラフィック調査及びフォレンジック用のツールがインストールされている。</td></tr>
+</table>
+表1　図1の各構成要素の仕様，機能及び利用方法（抜粋）
+注1）HTTP及びHTTPS通信をプロキシサービスに送り，そのログを取得する機能をもつ。
+注2）xには，英大文字が1字以上入る。
+
+〔ツールの開発〕
+　情シス部のX主任とYさんは，インシデント対応時にログの調査に手間どらないように，証拠データを収集するツール（以下，Fツールという）を開発することにした。Fツールの概要を図2に示す。
+
+<div class="fbox">■機能
+・インシデント対応時に1台の仮想PC上で，インシデント対応に必要なログ，レジストリなどの証拠データを収集元から収集し，表2に示す出力ファイルを出力する。
+・証拠データの収集元及び保存先並びに出力ファイルの出力先は，設定ファイルで指定する。
+■使い方
+・仮想PCが稼働しているときは，仮想PC上で実行する。
+・仮想PCが稼働していないときは，保守用PCに仮想PCのディスクイメージをコピーしてマウントし，保守用PC上で実行する。</div>
+図2　Fツールの概要（抜粋）
+
+<table class="small-table" style="width:100%;">
+<tr><th>ファイル名</th><th>記載される内容</th></tr>
+<tr><td>file.csv</td><td>ファイルの生成，参照，更新，削除及び実行のログ</td></tr>
+<tr><td>srv.csv</td><td>サービス及びタスク（注1）の登録，削除，開始及び停止のログ</td></tr>
+<tr><td>auth.csv</td><td>認証（注2）の成功と失敗，アカウントの作成，特権の利用，イベントログの消去などのログ</td></tr>
+<tr><td>net1.csv</td><td>Qプログラムのログ</td></tr>
+<tr><td>net2.csv</td><td>プロセスごとの1時間のネットワーク送受信量の記録</td></tr>
+<tr><td>time.csv</td><td>file.csv，srv.csv，auth.csv，net1.csvを結合して時刻順に並べ替えたもの</td></tr>
+</table>
+表2　Fツールの出力ファイル
+注1）決められたスケジュール及び指定したイベントをトリガーに実行されるプログラム
+注2）対話型，ネットワーク，サービス，RDPなど，ログオンの種類も記録される。
+
+〔インシデント発生時のFツール活用〕
+　12月6日，情シス部のYさんは，プロキシサービスからアラートメールを受信した。Yさんが，アラートメールを確認したところ，PC-Aが，https://○○○.com/にアクセスしようとしてアクセスが拒否されたこと及びそのURLがベンダー拒否リストのマルウェア感染のカテゴリに一致したことが分かり，上司のX主任に報告した。
+　PC-Aが割り当てられている従業員に連絡した上で，X主任は，PC-Aを一旦，仮想スイッチから切り離してFツールを実行し，Fツールの出力ファイルとプロキシサービスの通信ログから，https://○○○.com/にアクセスした原因を調査するようにYさんに指示した。
+　PC-AでのFツールの出力ファイルのうち，time.csvを表3に，net2.csvを表4に，プロキシサービスの通信ログのうち送信元がPC-Aであるものを表5に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>日時</th><th>事象</th><th>ファイル名</th></tr>
+<tr><td>12/04 22:12:28</td><td>https://○○search.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/04 22:20:34</td><td>https://△△△.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/04 22:32:48</td><td>i.ps1が作成された。</td><td>file.csv</td></tr>
+<tr><td>12/04 22:33:12</td><td>i.ps1がPowerShellで実行された。</td><td>file.csv</td></tr>
+<tr><td>12/04 22:33:21</td><td>“タスク名：install”が登録された。</td><td>srv.csv</td></tr>
+<tr><td>12/04 22:33:22</td><td>“タスク名：install”が実行された。</td><td>srv.csv</td></tr>
+<tr><td>12/04 22:33:25</td><td>https://△△△.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/04 22:34:28</td><td>VSCAN_SVC（注1）が停止された。</td><td>srv.csv</td></tr>
+<tr><td>12/04 22:38:12</td><td>Dドライブのファイルが参照された。</td><td>file.csv</td></tr>
+<tr><td>（省略）（注2）</td><td></td><td></td></tr>
+<tr><td>12/04 22:42:06</td><td>¥¥filesvのファイルが参照された。</td><td>file.csv</td></tr>
+<tr><td>（省略）（注3）</td><td></td><td></td></tr>
+<tr><td>12/04 22:59:07</td><td>s.rarが作成された。</td><td>file.csv</td></tr>
+<tr><td>12/04 23:00:05</td><td>https://△△△.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/04 23:10:05</td><td>s.rarが削除された。</td><td>file.csv</td></tr>
+<tr><td>12/04 23:31:15</td><td>PC-Aからドメインサーバに，ad01¥user019でRDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:32:05</td><td>PC-AからPC-Bに，ad01¥user019で，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:32:16</td><td>PC-AからPC-Bに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:32:22</td><td>PC-AからPC-Cに，ad01¥user019で，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:32:35</td><td>PC-AからPC-Cに，.¥administratorで，RDP接続が許可された。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:35:01</td><td>PC-AからPC-Dに，ad01¥user019で，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:35:17</td><td>PC-AからPC-Dに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:35:21</td><td>PC-AからPC-Dに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:35:36</td><td>PC-AからPC-Eに，ad01¥user019で，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:35:45</td><td>PC-AからPC-Eに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:35:52</td><td>PC-AからPC-Eに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:36:02</td><td>PC-AからPC-Fに，ad01¥user019で，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:36:15</td><td>PC-AからPC-Fに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:36:24</td><td>PC-AからPC-Fに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:37:35</td><td>PC-AからPC-Gに，ad01¥user019で，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:37:49</td><td>PC-AからPC-Gに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>12/04 23:37:54</td><td>PC-AからPC-Gに，.¥administratorで，RDP接続が失敗した。</td><td>auth.csv</td></tr>
+<tr><td>（省略）（注4）</td><td></td><td></td></tr>
+<tr><td>12/05 22:34:05</td><td>https://○○○.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/05 23:34:05</td><td>https://○○○.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 00:34:05</td><td>https://○○○.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 01:34:04</td><td>https://○○○.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 02:34:03</td><td>https://○○○.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 02:34:04</td><td>https://○○○.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 02:34:05</td><td>https://□□□.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 03:34:05</td><td>https://□□□.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 04:34:05</td><td>https://□□□.com/に接続を試みた。</td><td>net1.csv</td></tr>
+<tr><td>12/06 05:34:04</td><td>https://□□□.com/に接続を試みた。</td><td>net1.csv</td></tr>
+</table>
+表3　PC-Aのtime.csv（抜粋）
+注記1　アカウント名の表記はdomainhost¥userNNNとしている。domainhostにはドメイン名又はホスト名が，userNNNには利用者IDがそれぞれ入る。ただし，domainhostが“.”の場合は，userNNNは仮想PCのローカルユーザーであることを示す。
+注記2　12/04 22:33:25から12/05 22:34:05の間に発生したhttps://○○○.com/への接続試行ログは省略している。
+注1）マルウェア対策ソフトのサービス名である。　注2）Dドライブのファイルの参照ログだけである。　注3）¥¥filesvのファイルの参照ログだけである。　注4）RDP接続の失敗ログだけである。
+
+<table class="small-table" style="width:100%;">
+<tr><th>日時</th><th>プロセス</th><th>ネットワーク送受信量（Mバイト）</th></tr>
+<tr><td>12/04 23:05:40</td><td>Webブラウザ</td><td>4.5</td></tr>
+<tr><td>12/04 23:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>810.0</td></tr>
+<tr><td>12/05 00:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>196.0</td></tr>
+<tr><td>（省略）（注1）</td><td></td><td></td></tr>
+<tr><td>12/06 00:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>0.1</td></tr>
+<tr><td>12/06 01:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>0.1</td></tr>
+<tr><td>12/06 02:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>0.1</td></tr>
+<tr><td>12/06 03:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>0.1</td></tr>
+<tr><td>12/06 04:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>0.1</td></tr>
+<tr><td>12/06 05:05:40</td><td>C:¥（省略）¥powershell.exe</td><td>0.1</td></tr>
+</table>
+表4　PC-Aのnet2.csv（抜粋）
+注記　プロセスごとの，毎時5分40秒までの1時間のネットワーク送受信量の記録である。
+注1）C:¥（省略）¥powershell.exeのネットワーク送受信量の行だけである。
+
+<table class="small-table" style="width:100%;">
+<tr><th>日時</th><th>利用者ID</th><th>宛先</th><th>宛先ポート番号</th><th>フィルタアクション</th><th>送受信量（Mバイト）</th></tr>
+<tr><td>12/04 22:12:28</td><td>ad01¥user019</td><td>https://○○search.com/</td><td>443</td><td>許可</td><td>1.0</td></tr>
+<tr><td>12/04 22:20:34</td><td>ad01¥user019</td><td>https://△△△.com/i.ps1</td><td>443</td><td>許可</td><td>2.0</td></tr>
+<tr><td>12/04 22:33:25</td><td>ad01¥user019</td><td>https://△△△.com/v/q.ps1</td><td>443</td><td>許可</td><td>4.0</td></tr>
+<tr><td>12/04 23:00:05</td><td>ad01¥user019</td><td>https://△△△.com/v/upl</td><td>443</td><td>許可</td><td>511.0</td></tr>
+<tr><td>12/04 23:34:02</td><td>ad01¥user019</td><td>https://○○○.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>（省略）（注1）</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>12/05 22:34:05</td><td>ad01¥user019</td><td>https://○○○.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>12/05 23:34:05</td><td>ad01¥user019</td><td>https://○○○.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>12/06 00:34:05</td><td>ad01¥user019</td><td>https://○○○.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>12/06 01:34:04</td><td>ad01¥user019</td><td>https://○○○.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>12/06 02:34:03</td><td>ad01¥user019</td><td>https://○○○.com/</td><td>443</td><td>拒否</td><td>－</td></tr>
+<tr><td>12/06 02:34:04</td><td>ad01¥user019</td><td>https://○○○.com/</td><td>443</td><td>拒否</td><td>－</td></tr>
+<tr><td>12/06 02:34:05</td><td>ad01¥user019</td><td>https://□□□.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>12/06 03:34:05</td><td>ad01¥user019</td><td>https://□□□.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>12/06 04:34:05</td><td>ad01¥user019</td><td>https://□□□.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+<tr><td>12/06 05:34:04</td><td>ad01¥user019</td><td>https://□□□.com/</td><td>443</td><td>許可</td><td>0.1</td></tr>
+</table>
+表5　プロキシサービスの通信ログのうち送信元がPC-Aであるもの（抜粋）
+注1）一つ前のログと同じhttps://○○○.com/への許可された通信のログだけである。
+
+〔暫定対策と追加調査の実施〕
+　X主任とYさんは，PC-Aがマルウェアに感染し，PC-A及び <span class="blank">a</span> 上のファイルのほか，<span class="blank">b</span> 上のファイルのうち，アカウント <span class="blank">c</span> でアクセス可能なファイルがインターネットに送信されているおそれがあると考え，図3の暫定対策と追加調査を行った。
+
+<div class="fbox">暫定対策
+ 1 マルウェア感染拡大とこれ以上のファイルの送信を防ぐために，ドメインサーバでアカウント <span class="blank">c</span> の <span class="blank">d</span> を行う。
+ 2 ファイルの送信を防ぐために，<u>①プロキシサービスで対策を行う</u>。
+追加調査
+ 1 表3から，PC-Aから <span class="blank">a</span> にマルウェア感染が拡大している可能性があると考えられるので，<span class="blank">a</span> についてPC-Aと同様の調査を行う。
+ 2 プロキシサービスのログで，PC-A，<span class="blank">a</span> のほかに<u>②マルウェアに感染しているL社内ホストがないか調査</u>を行う。</div>
+図3　暫定対策と追加調査
+
+　また，X主任はPC-Aの証拠データと，PC-Aの調査で収集できたi.ps1をセキュリティ専門会社であるC社に提供し，解析を依頼した。C社の解析結果を図4に示す。
+
+<div class="fbox">i.ps1の動作
+ (a) タスクを登録する。登録するタスクの設定は次のとおりである。既に同じタスク名のタスクが登録されている場合は何もしない。
+    タスク名：install
+    実行時に使うアカウント：タスク登録時に，ログオンしているアカウント
+    登録するスクリプトの動作：https://△△△.com/v/q.ps1をメモリ上に展開し，実行する。
+    タスク実行のトリガー：ログオン時に実行される。
+ (b) タスクを登録した後に，(a)で登録したタスクを実行する。
+
+q.ps1の動作
+ 解析に用いたファイルは，当社が12月6日15時に，https://△△△.com/v/q.ps1からダウンロードしたものである。次は，当社が入手した脅威情報を加味したものである。
+ (c) マルウェア対策ソフトを停止する。
+ (d) 特定のディスク領域とネットワークドライブのファイルをRAR形式でアーカイブファイルにまとめ，https://△△△.com/v/uplを使ってアップロードする。
+ (e) 1時間おきにhttps://○○○.com/にコネクトバック通信をする。
+ (f) (e)の通信ができない場合，リトライ通信を1回行う。リトライ通信に失敗した場合は，https://□□□.com/にコネクトバック通信をし，以降は，1時間おきにhttps://□□□.com/にコネクトバック通信をする。
+ (g) パスワード又はパスワードハッシュをPCのメモリ上から窃取する。
+ (h) pingコマンドを使ってホストを探索し，RDP接続を試みる。RDP接続に失敗した場合，何もしない。
+ (i) RDP接続に成功すると，接続先でi.ps1の実行を試みる。</div>
+図4　C社の解析結果（概要）
+
+　Yさんは図4の解析結果から，図3の追加調査の1及び2では，図4で解析したマルウェアが，今後，活動する可能性があるL社内ホストを見逃したおそれがあると考えた。Yさんは<u>③追加調査の3として，L社内ホストの全てに対して新たな調査を行う必要がある</u>のではないかとX主任に相談した。X主任は同意し，調査には時間が掛かるので，調査と並行して，<u>④図4のマルウェアの活動を自動的に検出する新たな仕組み</u>を作るように指示した。
+　この追加調査の3では，<span class="blank">a</span> だけがマルウェアに感染した可能性があることが判明し，必要な対処を行った。また，新たにマルウェアの活動は検出されなかったので，復旧に向け対応を進めることにした。
+
+〔技術的対策の立案〕
+　X主任とYさんは，今回と同様のマルウェア感染が起きた場合に備えて，図3の暫定対策以外に，攻撃者による目的実行までの活動を阻止するための技術的対策を，表6のとおりにまとめた。
+
+<table class="small-table" style="width:100%;">
+<tr><th>今回の攻撃者による活動</th><th>技術的対策</th></tr>
+<tr><td>i.ps1とq.ps1をPC-Aで実行させた。</td><td>PowerShellの実行ポリシーを設定し，署名のないスクリプトの実行を禁止する。</td></tr>
+<tr><td>PC-Aからマルウェア感染を広げた。</td><td><span class="blank">e</span>。</td></tr>
+<tr><td>q.ps1がファイルを不正に持ち出した。</td><td><span class="blank">f</span>。</td></tr>
+</table>
+表6　攻撃者による目的実行までの活動を阻止するための技術的対策
+
+　今後，表6中の技術的対策について，X主任とYさんが中心となって導入の計画立案を進めることにした。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　〔暫定対策と追加調査の実施〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 本文中及び図3中の a に入れる適切なホスト名を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="PC-C" data-alt=""><textarea maxlength="6" placeholder="ホスト名"></textarea><span class="charcount">0/6</span></div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(2) 本文中の b に入れる適切なホスト名を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="filesv" data-alt=""><textarea maxlength="8" placeholder="ホスト名"></textarea><span class="charcount">0/8</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(3) 本文中及び図3中の c に入れる適切なアカウント名を，表3の注記1に従って答えよ。</div>
+    <div class="field-row" data-label="" data-answer="ad01¥user019" data-alt="ad01\user019"><textarea maxlength="14" placeholder="アカウント名"></textarea><span class="charcount">0/14</span></div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(4) 図3中の d に入れる適切な対策を10字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="無効化" data-alt="停止|ロック|パスワードの変更"><textarea maxlength="10" placeholder="10字以内"></textarea><span class="charcount">0/10</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(5) 図3中の下線①について，対策の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="管理者拒否リストに，https://△△△.com/とhttps://□□□.com/を追加する。" data-alt="管理者拒否リストにアップロード先のURLを追加する。"><textarea maxlength="58" placeholder="40字程度"></textarea><span class="charcount">0/58</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(6) 図3中の下線②について，調査の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="宛先がhttps://△△△.com/，https://○○○.com/又はhttps://□□□.com/であるL社内ホストを，プロキシサービスの通信ログから探す。" data-alt="プロキシサービスのログで，△△△.com，○○○.com，□□□.comにアクセスしたホストを調べる。"><textarea maxlength="97" placeholder="60字程度"></textarea><span class="charcount">0/97</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(7) 本文中の下線③について，調査の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="L社内ホストの全てで，タスク名installのタスクが登録されていないかどうかを調べる。" data-alt="全ホストでタスクinstallの登録有無を確認する。|Fツールのsrv.csvでタスク名installの登録を調べる。"><textarea maxlength="50" placeholder="50字程度"></textarea><span class="charcount">0/50</span></div>
+  </div>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(8) 本文中の下線④について，検出する仕組みを，二つ答えよ。</div>
+    <div class="field-row" data-label="1" data-answer="マルウェア対策ソフトのサービスが停止されたことを検知して，アラートを送付する仕組み" data-alt="VSCAN_SVCの停止を検知する仕組み"><textarea maxlength="49" placeholder="1つ目"></textarea><span class="charcount">0/49</span></div>
+    <div class="field-row" data-label="2" data-answer="RDP接続の失敗が短時間に多数発生したことを検知して，アラートを送付する仕組み" data-alt="タスクinstallの登録を検知する仕組み|1時間おきの定期的な通信を検知する仕組み|PowerShellによる外部スクリプトのダウンロードを検知する仕組み"><textarea maxlength="40" placeholder="2つ目"></textarea><span class="charcount">0/40</span></div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　表6中のe，fに入れる適切な字句を答えよ。</h2>
+  <div class="qa-item" data-points="24">
+    <div class="field-row" data-label="e" data-answer="仮想PC同士のRDP通信を禁止する" data-alt="仮想PC間の通信を禁止する"><textarea maxlength="30" placeholder="e"></textarea><span class="charcount">0/30</span></div>
+    <div class="field-row" data-label="f" data-answer="プロキシサービスの管理者許可リストに業務で必要なURLだけを登録し，管理者拒否リストに“全て”を設定する" data-alt="許可するURL以外へのアクセスを拒否する設定にする"><textarea maxlength="61" placeholder="f"></textarea><span class="charcount">0/61</span></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。ネットワーク構成図などは文字による簡易表現です。<br>
+    ※ <b>模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。</b>採点後は，IPAが公表している解答例・採点講評と見比べてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="../assets/engine.js"></script>
+</body>
+</html>
