@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情報処理安全確保支援士 午後問題演習｜令和7年度 秋期</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="backlink" href="../index.html">← 年度一覧に戻る</a>
+  <h1>情報処理安全確保支援士試験 午後問題 演習</h1>
+  <div class="meta">令和7年度 秋期／過去問4問（本試験は2問選択）</div>
+
+  <ul class="q-list">
+    <li><a href="q1.html">問1　コンサルティング業務で利用するSaaS</a>
+      <div class="desc">全4設問／CSPの動作，格納型XSSを使った権限昇格攻撃の調査と対策</div>
+    </li>
+    <li><a href="q2.html">問2　暗号資産交換業におけるセキュリティ</a>
+      <div class="desc">全4設問／署名鍵の保護，出庫業務の不正移転対策，HSMへの鍵移送手順の検討</div>
+    </li>
+    <li><a href="q3.html">問3　情報システムのセキュリティ強化</a>
+      <div class="desc">全5設問／DNS関連プロトコル，インターネットバンキングの改ざん手口，Kサービス導入に伴うネットワーク設定</div>
+    </li>
+    <li><a href="q4.html">問4　製造業におけるセキュリティ管理</a>
+      <div class="desc">全4設問／マルウェア対策機能の比較，リスク対応方法と権限見直し，表4・表6の対策と復旧計画</div>
+    </li>
+  </ul>
+
+  <div class="note">
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。<br>
+    ※ 各設問の記述式解答は文字集合ベースの類似度採点（参考実装）であり，公式の採点基準とは異なります。<br>※ 模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。<br>
+  </div>
+</div>
+</body>
+</html>
