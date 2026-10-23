@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問1 コンサルティング業務で利用するSaaS｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問1　コンサルティング業務で利用するSaaS</h1>
+  <div class="meta">令和7年度 秋期 情報処理安全確保支援士試験 午後問題　問1／全10設問</div>
+
+  <div class="mondai">コンサルティング業務で利用するSaaSに関する次の記述を読んで，設問に答えよ。
+
+　H社では，コンサルティング業務で利用するSaaS（以下，Sサービスという）を提供している。コンサルティング業務を行う企業50社程度がSサービスを利用しており，総利用者数は1,000名程度である。
+
+〔Sサービスの概要〕
+　Sサービスでは，利用企業ごとに複数のプロジェクトを登録できる。Sサービスの利用者には2種類のロールがある。自社の全てのプロジェクトの情報にアクセスできる管理者と，自身に割り当てられているプロジェクトの情報だけにアクセスできる一般利用者である。
+　Sサービスには，プロジェクトを管理する機能（以下，プロジェクト管理機能という）のほか，利用者がプロジェクト内で特定の話題ごとに“スレッド”と呼ばれるページを作成する機能（以下，スレッド作成機能という），スレッドに文章を投稿したりファイルをアップロードしたりする機能（以下，スレッド投稿機能という）などが設けられている。
+　Sサービスの主な機能を表1に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>機能名</th><th>機能概要</th><th>備考</th></tr>
+<tr><td>ログイン</td><td>（省略）</td><td>（省略）</td></tr>
+<tr><td>利用者管理</td><td>管理者が，利用者の登録，変更及び削除を行う。</td><td>登録された利用者には，利用企業内で一意となる利用者IDが発行される。利用者IDの形式は次のとおりである。
+“U”と数字8桁をつなげた文字列</td></tr>
+<tr><td>ロール管理</td><td>管理者が，利用者のロールを設定する。</td><td>処理の流れは次のとおりである。
+1. ログイン後の画面からロール管理機能を選択すると，パス“/management/role”にリクエストがGETメソッドで送信される。csrf_tokenという一時的でランダムな文字列のトークンが発行され，ロール設定画面が表示される。
+2. ロール設定画面で任意の利用者のロールを変更し，確定ボタンをクリックすると，パス“/management/roleset”に対して，パラメータ csrf_token，is_admin 及び user_id を含むリクエストが POST メソッドで送信される。パラメータ is_admin は指定した利用者のロールに応じて次のいずれかが設定される。
+ - 管理者：is_admin=1
+ - 一般利用者：is_admin=0</td></tr>
+<tr><td>プロジェクト管理</td><td>管理者が，プロジェクトの登録及び変更を行う。また，プロジェクトに一般利用者を割り当てる。</td><td>プロジェクトには，利用企業内で一意となるプロジェクトIDが発行される。プロジェクトIDの形式は次のとおりである。
+“P”と数字8桁をつなげた文字列</td></tr>
+<tr><td>タスク管理</td><td>利用者が，プロジェクトのタスク管理画面からタスクを登録し，タスクの担当者を割り当てる。また，タスクの更新を行う。</td><td>タスクには，次の項目を設定する。
+・タスク名
+・タスクの詳細説明
+・タスクの担当者
+・タスクの締切日
+・タスクの進捗状況
+・タスクの完了フラグ</td></tr>
+<tr><td>スレッド作成</td><td>利用者が，スレッドを作成する。</td><td>スレッドの作成時には，アクセスできる一般利用者を指定する。管理者は利用企業内の全てのスレッドにアクセスできる。</td></tr>
+<tr><td>スレッド投稿</td><td>利用者が，アクセスできるスレッドに文章の投稿とファイルのアップロードを行う。</td><td>アップロードできるファイルの拡張子は，docx，xlsx，pptx，pdf，jpg，gif 及び png の7種類である。アップロードされたファイルは，ファイル識別子が一意になるように変更されてからサーバに保存される。ファイルの参照時及びダウンロード時のパスは次のとおりである。
+/files/[一意のファイル識別子].[拡張子]
+スレッドにアクセスできる利用者だけがアクセスできる。</td></tr>
+<tr><td>プロジェクト進捗管理</td><td>利用者が，プロジェクトの進捗を管理する。スケジュールの作成及び管理並びにタスクの進捗確認を行う。</td><td>未完了のタスクのうち締切日を過ぎたものは，プロジェクト進捗管理画面にそのタスク名と締切日からの経過日数が表示される。</td></tr>
+</table>
+表1　Sサービスの主な機能（抜粋）
+
+　Sサービスでは，半年ごと及び新機能リリース前に診断ツールXによる脆弱性診断を実施することにしている。診断ツールXは，送信したリクエストとそれに対するレスポンスから脆弱性を検出する。
+　Sサービスでは，HTTPレスポンスヘッダーにContent Security Policy（CSP）を設定している。図1に，SサービスのHTTPレスポンスヘッダーの例を示す。
+
+<div class="fbox code">HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Encoding: gzip
+Content-Type: text/html; charset=UTF-8
+Date: （省略）
+X-Frame-Options: SAMEORIGIN
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Set-Cookie: JSESSIONID=e962879ef251f2117460cf0d5ce714e3; Secure; HttpOnly
+Content-Security-Policy: default-src 'self';
+Content-Length: 31337</div>
+図1　SサービスのHTTPレスポンスヘッダーの例
+
+　図1の設定では，リソースの読込みとスクリプトの実行に関する動作は次のようになる。
+・Sサービス以外のドメインからのリソースの読込み：<span class="blank">a</span>
+・scriptタグ内に直接記述されたスクリプトの実行：<span class="blank">b</span>
+
+〔インシデントの発生とその調査〕
+　ある日，Sサービスを利用しているB社の管理者からH社に対して，“Sサービスの一般利用者であった元従業員Zのローカル PC 上に，元従業員Zが割り当てられていなかったプロジェクトのファイルが保存されていたので，Sサービスに不具合がないか調査してほしい”との依頼があった。
+　Sサービスのシステム担当者であるUさんは，ログを確認するとともに，B社の許可を得た上で，B社の管理者の利用者IDを使ってログインし，幾つかの画面を確認した。そのうち，プロジェクト進捗管理画面のHTMLを図2に，そのHTMLが参照していた F1234567890.xlsx というファイルをテキストエディターで開いたときの内容を図3に示す。
+
+<div class="fbox code">&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;プロジェクト進捗管理&lt;/title&gt;
+    &lt;link href="/static/css/style.css" rel="stylesheet" type="text/css"&gt;
+    &lt;script src="/static/js/action.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;プロジェクト進捗管理（プロジェクトID：P00395000）&lt;/h1&gt;
+ （省略）
+    &lt;div name="alert"&gt;
+        &lt;div name="alert-title"&gt;期限切れタスク一覧&lt;/div&gt;
+        &lt;div name="alert-description"&gt;
+            次のタスクが締切日を過ぎています。&lt;br&gt;
+        &lt;/div&gt;
+        &lt;ul className="delayed-task"&gt;
+            &lt;li&gt;G社のコンペ資料作成（締切日過ぎ1日）&lt;/li&gt;
+            &lt;li&gt;G社の業界分析（締切日過ぎ4日）&lt;/li&gt;
+            &lt;li&gt;個人タスク&lt;script src="/files/F1234567890.xlsx"&gt;&lt;/script&gt;（締切日過ぎ5日）&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+ （省略）
+&lt;/body&gt;
+&lt;/html&gt;</div>
+図2　プロジェクト進捗管理画面のHTML
+
+<div class="fbox code">(async function() {
+    const response = await fetch("/management/role");
+    const text = await response.text();
+    // 次の2行で csrf_token を取得
+    const tokenMatch = text.match(/id="csrf_token"[^&gt;]*value="([^"]+)"/);
+    const csrfToken = tokenMatch[1];
+    await fetch("/management/roleset", {
+        method: "POST",
+        // POST メソッドのリクエスト body
+        body: new URLSearchParams({
+            "csrf_token": csrfToken,
+            "is_admin": "1",
+            "user_id": "U00331001"
+        })
+    });
+})();</div>
+図3　F1234567890.xlsx の内容（注記　整形とコメントの追記は，Uさんによるものである。）
+
+　Uさんは，調査の結果，図4に示す攻撃が実行されていたことを確認した。
+
+<div class="fbox">1. 元従業員Zの利用者IDでアクセスできるスレッドに，F1234567890.xlsx をアップロードした。
+2. 当該利用者IDで，タスク管理画面から <span class="blank">c</span> に次の文字列を指定して，タスクを登録した。
+   文字列：<span class="blank">d</span>
+3. その後，2で登録したタスクが次の条件を満たしたときに，<span class="blank">e</span> がプロジェクト進捗管理画面にアクセスした。
+   条件：未完了の状態で，かつ，<span class="blank">f</span>
+4. 3の結果，図2のHTMLが <span class="blank">e</span> のWebブラウザに出力された。
+5. 4の結果，図3のスクリプトが実行された。
+6. 5の結果，元従業員Zの利用者IDであったU00331001に対して次の処理が行われた。
+   処理：<span class="blank">g</span>
+（省略）
+8. 元従業員Zの利用者IDで，調査依頼の発端となったファイルをダウンロードした。</div>
+図4　実行されていた攻撃
+
+　Uさんは，図4の項番2と類似した文字列が指定されたタスクが登録されていないかどうかを確認したところ，完了済みタスクの中に類似したものがあることを確認した。しかし，このタスクによる攻撃は，CSPの設定で防御できていた。
+　Uさんは，攻撃者がこの失敗の原因を分析し，失敗したときに使用した文字列に<u>①工夫</u>を加えることによって図4の項番2の文字列を作成し，攻撃を成功させたと推測した。
+
+〔インシデントへの対応及び攻撃への対策〕
+　Uさんは，まず必要なインシデント対応を行った。その結果，図4以外に成功した攻撃はないことが分かった。Uさんは，結果をB社の管理者に報告した。また，ほかの利用企業で同様の攻撃がなかったかどうかを調査したところ，なかったことも分かった。
+　次に，図4と同様の攻撃を防止するために，次の対策を行った。
+(1) 図4の項番1については，アップロードされたファイルが許可された拡張子であることのチェックに加えて，次の処理を追加する。
+　処理：<span class="blank">h</span>
+(2) 図4の項番4について，類似の問題がないかどうか，Sサービス全体を確認したところ，問題は1箇所だけだったので，表1の機能のうち，<span class="blank">i</span> について，<u>②必要な処理</u>を追加する。なお，この処理が行われていないという脆弱性は，診断ツールXでは検知されない。
+
+〔開発プロセスの見直し検討〕
+　Uさんは，図4の項番4の脆弱性のように診断ツールXで検知されないものであっても，検知できる可能性のある検査として，次の二つも実施するという開発プロセスの見直し案を作成した。
+・SAST
+・<span class="blank">j</span>
+　Uさんは，開発プロセスの見直し案について承認を得て，見直しに着手した。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　本文中のa，bに入れる適切な字句を答えよ。</h2>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">本文中の a，b に入れる適切な字句を，“できる”，“できない”のいずれかでそれぞれ答えよ。</div>
+    <div class="field-row" data-label="a" data-answer="できない" data-alt=""><textarea maxlength="5" placeholder="“できる”／“できない”"></textarea><span class="charcount">0/5</span></div>
+    <div class="field-row" data-label="b" data-answer="できない" data-alt=""><textarea maxlength="5" placeholder="“できる”／“できない”"></textarea><span class="charcount">0/5</span></div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔インシデントの発生とその調査〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 図3のスクリプトは，表1中のどの機能を悪用するものか。機能名を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="ロール管理" data-alt=""><textarea maxlength="8" placeholder="機能名"></textarea><span class="charcount">0/8</span></div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(2) 図4中の c に入れる適切なタスクの項目を，表1中の字句を用いて答えよ。</div>
+    <div class="field-row" data-label="" data-answer="タスク名" data-alt=""><textarea maxlength="8" placeholder="項目"></textarea><span class="charcount">0/8</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(3) 図4中の d に入れる適切な文字列を，図2から抜き出して答えよ。</div>
+    <div class="field-row" data-label="" data-answer="個人タスク&lt;script src=&quot;/files/F1234567890.xlsx&quot;&gt;&lt;/script&gt;" data-alt=""><textarea maxlength="60" placeholder="図2から抜き出す"></textarea><span class="charcount">0/60</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(4) 図4中の e ～ g に入れる適切な字句を答えよ。</div>
+    <div class="field-row" data-label="e" data-answer="B社の管理者" data-alt="プロジェクトの管理者|管理者"><textarea maxlength="12" placeholder="e"></textarea><span class="charcount">0/12</span></div>
+    <div class="field-row" data-label="f" data-answer="締切日を過ぎている" data-alt="締切日を過ぎたとき"><textarea maxlength="18" placeholder="f"></textarea><span class="charcount">0/18</span></div>
+    <div class="field-row" data-label="g" data-answer="一般利用者から管理者にロールが変更された。" data-alt="管理者のロールに変更された|管理者に変更される"><textarea maxlength="30" placeholder="g"></textarea><span class="charcount">0/30</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(5) 本文中の下線①について，工夫の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="スクリプトを直接記述するのではなく，アップロードしたファイルをscriptタグのsrc属性で読み込ませるようにした。" data-alt="scriptタグに直接記述せず，同一ドメイン上にアップロードしたファイルをsrc属性で指定した。"><textarea maxlength="60" placeholder="60字程度"></textarea><span class="charcount">0/60</span></div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔インシデントへの対応及び攻撃への対策〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 本文中の h に入れる追加すべき処理の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="ファイルの内容が，拡張子が示すファイル形式のものであることを確認する。" data-alt="アップロードされたファイルの中身が拡張子に対応した形式であるかを検査する。"><textarea maxlength="40" placeholder="40字程度"></textarea><span class="charcount">0/40</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(2) 本文中の i に入れる適切な機能名を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="プロジェクト進捗管理" data-alt="プロジェクト進捗管理機能"><textarea maxlength="12" placeholder="機能名"></textarea><span class="charcount">0/12</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(3) 本文中の下線②について，追加すべき処理の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="タスク名を画面に出力する際に，HTMLエスケープ処理を行う。" data-alt="タスク名の出力時に特殊文字をエスケープする。"><textarea maxlength="35" placeholder="35字程度"></textarea><span class="charcount">0/35</span></div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4　本文中のjに入れる適切な検査方法を，具体的に答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="field-row" data-label="" data-answer="診断員の手作業による脆弱性診断（ペネトレーションテスト）" data-alt="ソースコードレビュー|手動での脆弱性診断"><textarea maxlength="30" placeholder="30字程度"></textarea><span class="charcount">0/30</span></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。ネットワーク構成図などは文字による簡易表現です。<br>
+    ※ <b>模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。</b>採点後は，IPAが公表している解答例・採点講評と見比べてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="../assets/engine.js"></script>
+</body>
+</html>
