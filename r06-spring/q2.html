@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問2 サイバー攻撃への対策｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問2　サイバー攻撃への対策</h1>
+  <div class="meta">令和6年度 春期 情報処理安全確保支援士試験 午後問題　問2／全9設問</div>
+
+  <div class="mondai">サイバー攻撃への対策に関する次の記述を読んで，設問に答えよ。
+
+　H社は，従業員3,000名の製造業であり，H社製品の部品を製造する約500社と取引を行っている。取引先は，H社に設置された取引先向けWebサーバにHTTPSでアクセスし，利用者IDとパスワードでログインした後，H社との取引業務を行っている。また，公開Webサーバでは，H社製品の紹介に加え，問合せや要望の受付を行っている。いずれのWebサーバが停止しても，業務に支障が出る。
+　H社では，社内に設置している PC（以下，H-PCという）とは別に，一部の従業員に対して，VPNクライアントソフトウェアを導入したリモート接続用PC（以下，リモート接続用PCをR-PCという）を貸与し，リモートワークを実現している。R-PCとH社との間のVPN通信には，VPNゲートウェイ（以下，VPNゲートウェイをVPN-GWという，H社が使用しているVPN-GWをVPN-Hという）を使用している。
+　H社のネットワークは，情報システム部のL部長とT主任を含む6名で運用している。H社のネットワーク構成を図1に示す。
+
+<div class="diag">R-PC ─ インターネット ─ UTM ─ L2SW ─ DMZ：取引先向けWebサーバ，公開Webサーバ，DNSサーバ（注1），プロキシサーバ（注2），メールサーバ，VPN-H
+UTM ─ 内部サーバセグメント／PCセグメント（L2SW ─ H-PC（複数））
+L2SW：レイヤー2スイッチ　UTM：統合脅威管理　メール：電子メール
+注1）H社ドメインの権威DNSサーバと再帰的な名前解決を行うフルサービスリゾルバを兼ねる。
+注2）H-PCからインターネットへのHTTP及びHTTPS通信を中継する。</div>
+図1　H社のネットワーク構成
+
+　UTMの機能概要及び設定を表1に，VPN-Hの機能概要及び設定を表2に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>機能名</th><th>機能概要</th><th>設定</th></tr>
+<tr><td>ファイアウォール機能</td><td>ステートフルパケットインスペクション型であり，送信元のIPアドレスとポート番号，宛先のIPアドレスとポート番号の組合せによる通信の許可と拒否のルールによって通信を制御する。</td><td>有効</td></tr>
+<tr><td>NAT機能</td><td>（省略）</td><td>有効</td></tr>
+<tr><td>IPS機能</td><td>不正アクセスの検知方法は，次の2通りを設定できる。
+アノマリ型：あらかじめ登録したしきい値を超えた通信を異常として検知する。
+シグネチャ型：あらかじめ登録したシグネチャと一致した通信を異常として検知する。</td><td>無効</td></tr>
+<tr><td>WAF機能</td><td>不正アクセスの検知方法は，IPS機能と同様に，アノマリ型とシグネチャ型を設定できる。</td><td>無効</td></tr>
+</table>
+表1　UTMの機能概要及び設定
+
+<table class="small-table" style="width:100%;">
+<tr><th>機能名</th><th>機能概要</th><th>設定</th></tr>
+<tr><td>VPN通信機能</td><td>VPNクライアントソフトウェアを導入したPCとの間でVPN通信を行う。
+VPN接続時の認証方式は，VPNクライアントソフトウェア起動時に表示されるダイアログボックス（以下，VPNダイアログという）に，利用者IDとパスワードを入力させる方式である。</td><td>有効</td></tr>
+<tr><td>多要素認証機能</td><td>利用者IDとパスワードによる認証方式に次のいずれかの認証方式を組み合わせた多要素認証を行う。
+(ア) スマートフォンにSMSでセキュリティコードを送り，その入力を確認する方式（注1）
+(イ) デジタル証明書によってクライアント認証を行う方式
+(ウ) スマートフォンにプッシュ通知を送り，その通知の承認を確認することで認証を行う方式</td><td>無効</td></tr>
+</table>
+表2　VPN-Hの機能概要及び設定（抜粋）
+注1）VPNダイアログに利用者IDとパスワードを入力し，その認証が完了すると，セキュリティコード入力画面が表示され，SMSでセキュリティコードがスマートフォンに送信される。送信されたセキュリティコードを，セキュリティコード入力画面に入力することで認証される。
+
+　最近，同業他社でサイバー攻撃による被害が2件立て続けに発生したという報道があった。1件は，VPN-GWが攻撃を受け，社内ネットワークに侵入されて情報漏えいが発生した事案である。もう1件は，DDoS攻撃による被害が発生した事案である。
+　H社でも同様な事案が発生する可能性について，L部長とT主任が調査することにした。
+
+〔VPN-GWへの攻撃に対する調査〕
+　T主任は，VPN-GWへの攻撃方法を次のようにまとめた。
+方法1：VPN-GWの認証情報を推測し，社内ネットワークに侵入する。
+方法2：VPN-GWの製品名や型番を調査した上で，社内ネットワークへの侵入が可能になる脆弱性を調べる。もし，脆弱性が存在すればその脆弱性を悪用し，社内ネットワークに侵入する。
+　T主任は，方法1については，VPN-Hの認証強化を検討することにした。また，方法2については，VPN-Hの脆弱性対策と，VPN-Hへのポートスキャンに対する応答を返さないようにする方法（以下，ステルス化という）を検討することにした。方法1と方法2についてT主任がまとめた対策案を表3に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>攻撃方法</th><th>対策</th><th>対策名</th><th>内容</th></tr>
+<tr><td>方法1</td><td>V-1</td><td>VPN-Hの認証強化</td><td>インターネットからVPN-Hへのアクセス時は，多要素認証を用いる。</td></tr>
+<tr><td>方法2</td><td>V-2</td><td>VPN-Hの脆弱性対策</td><td>（省略）</td></tr>
+<tr><td></td><td>V-3</td><td>ステルス化</td><td>VPN-Hのポートを通常は応答を返さないように設定しておく。H社が許可したPCからのアクセス時だけ，接続を許可する。</td></tr>
+</table>
+表3　方法1と方法2についてT主任がまとめた対策案
+
+〔DDoS攻撃に対する調査〕
+　次に，T主任は，DDoSに関連する攻撃について調査し，H社で未対策のものを表4にまとめた。
+
+<table class="small-table" style="width:100%;">
+<tr><th>項番</th><th>攻撃</th><th>例</th></tr>
+<tr><td>1</td><td>UDP Flood攻撃</td><td>公開Webサーバ，DNSサーバを攻撃対象に，偽の送信元IPアドレスとランダムな宛先ポート番号を設定したUDPデータグラムを大量に送り付ける。</td></tr>
+<tr><td>2</td><td>SYN Flood攻撃</td><td>（省略）</td></tr>
+<tr><td>3</td><td>DNSリフレクション攻撃の踏み台にされる</td><td>（省略）</td></tr>
+<tr><td>4</td><td>HTTP GET Flood攻撃</td><td><span class="blank">a</span></td></tr>
+</table>
+表4　H社で未対策のDDoSに関連する攻撃
+
+　次は，表4についてのT主任とL部長の会話である。
+
+T主任：項番1，2，4のDDoS攻撃のサーバへの影響は，UTMのIPS機能とWAF機能で軽減することができます。
+L部長：そうか。機能の設定に関する注意点はあるのかな。
+T主任：例えば，アノマリ型IPS機能で，トラフィック量について，しきい値が高すぎる場合にも，<u>①しきい値が低すぎる場合にも弊害が発生する</u>ので，しきい値の設定には注意するようにします。また，項番3の対策として，現在のDNSサーバを廃止して，権威DNSサーバの機能をもつサーバ（以下，DNS-Kという）とフルサービスリゾルバの機能をもつサーバ（以下，DNS-Fという）を社内に新設します。インターネットから社内へのDNS通信は <span class="blank">b</span> への通信だけを許可し，社内からインターネットへのDNS通信は <span class="blank">c</span> からの通信だけを許可します。
+
+〔対策V-1についての検討〕
+　次は，対策V-1についてのL部長とT主任の会話である。
+
+L部長：対策V-1での注意点はあるのかな。
+T主任：最近は，多要素認証の利用が多くなってきたこともあり，多要素認証を狙った攻撃が発生しています。多要素認証を狙った攻撃例を表5に示します。
+
+<table class="small-table" style="width:100%;">
+<tr><th>攻撃例</th><th>概要</th></tr>
+<tr><td>攻撃例1</td><td>表2の(ア)と組み合わせた多要素認証を突破するフィッシング攻撃であり，次の手順で行われる。
+(1) 攻撃者が，フィッシングメールを使って，VPNダイアログの画面を装った罠のWebサイトに正規利用者を誘導し，正規利用者に利用者IDとパスワードを入力させる。
+(2) <span class="blank">d</span>
+(3) <span class="blank">e</span>
+(4) 攻撃者が，社内ネットワークに不正に接続する。</td></tr>
+<tr><td>攻撃例2</td><td>表2の(ウ)と組み合わせた多要素認証を突破する多要素認証疲労攻撃であり，次の手順で行われる。
+（省略）</td></tr>
+</table>
+表5　多要素認証を狙った攻撃例
+
+L部長：攻撃例1については，不正なリモート接続を阻止するために，メールで受信したメッセージ内のURLリンクを安易にクリックしないよう注意喚起する必要があるな。
+T主任：はい。しかし，当社では，業務の手続の督促などで従業員にURLリンクが含まれるメールを送っているので，URLリンクのクリックを禁止することはできません。不審なURLかどうかを見極めさせることは難しいでしょう。そこで，<u>②たとえ罠のWebサイトへのURLリンクをクリックしてしまっても，不正なリモート接続をされないように，従業員全員が理解できる内容を，注意喚起する必要があります</u>。
+
+〔対策V-3についての検討〕
+　次は，対策V-3についてのL部長とT主任の会話である。
+
+L部長：対策V-3について説明してほしい。
+T主任：VPN-Hには，どのような通信要求に対しても応答しない“Deny-All”を設定した上で，あらかじめ設定されている順番にポートに通信要求を受信した場合だけ所定のポートへの接続を許可するという設定（以下，設定Pという）があります。
+L部長：設定Pの注意点はあるのかな。
+T主任：設定されている順番を攻撃者が知らなくても，<u>③攻撃者が何らかの方法でパケットを盗聴できた場合，設定Pを突破されてしまいます</u>。
+L部長：設定Pとは別の方法はあるのかな。
+T主任：VPN-Hの機能にはありませんが，SPA（Single Packet Authorization）というプロトコルがあります。SPAの主な仕様を表6に示します。
+
+<table class="small-table" style="width:100%;">
+<tr><th>項番</th><th>内容</th></tr>
+<tr><td>1</td><td>TCPのSYNパケット又はUDPの最初のパケット（以下，SPAパケットという）には，HMACベースのワンタイムパスワードが含まれている。送信先では，送信元の真正性を送信先で検証できる。検証に成功すれば，以降の通信のパケットは許可される。検証に失敗すれば，以降の通信のパケットは破棄される。</td></tr>
+<tr><td>2</td><td>SPAパケットにはランダムデータが含まれており，送信先で検証される。以前受信したものと同じランダムデータをもつSPAパケットを受信した場合は，破棄される。</td></tr>
+<tr><td>3</td><td>SPAパケットの最後尾フィールドには先行フィールドのハッシュ値が格納されている。送信先では，この値を検証し，検証に失敗すれば，そのパケットは破棄される。</td></tr>
+<tr><td>4</td><td>送信先では，検証した結果は，送信元に返さない。</td></tr>
+</table>
+表6　SPAの主な仕様
+
+T主任：SPAなら，<u>④攻撃者が何らかの方法でパケットを盗聴できたとしても，突破はされません</u>。
+L部長：そうか。VPN通信機能と同様の機能をもち，SPAを採用している製品があるかどうか，ベンダーに相談してみよう。
+
+〔S-APPLの導入検討〕
+　L部長がベンダーに相談したところ，S社が提供しているアプライアンス（以下，S-APPLという）の紹介があった。L部長とT主任は，S-APPLの導入検討を進めた。
+　S-APPLは，VPN通信機能，SPAパケットを検証する機能などをもつ。S-APPLと接続するためには，S-APPLのエージェントソフトウェア（以下，Sソフトという）を接続元のPCに導入し，接続元のPCごとのIDと秘密情報を，S-APPLと接続元のPCそれぞれに設定する必要がある。なお，秘密情報は，SPAパケットのHMACベースのワンタイムパスワードの生成などに使われる。S-APPLとSソフトの主な機能を表7に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>項番</th><th>機能名</th><th>機能概要</th></tr>
+<tr><td>1</td><td>SPA機能</td><td>SPAパケットを用いて送信元の真正性をS-APPLが検証する。</td></tr>
+<tr><td>2</td><td>VPN通信機能</td><td>S-APPLとSソフトを導入したPCとの間でVPNを確立する。</td></tr>
+<tr><td>3</td><td>多要素認証機能</td><td>VPN-Hの多要素認証機能と同じ機能をもつ。</td></tr>
+<tr><td>4</td><td>接続サーバ許可機能</td><td>VPN確立後にアクセス可能なサーバをPCごとに設定する。</td></tr>
+</table>
+表7　S-APPLとSソフトの主な機能
+
+　T主任は，対策V-1～3について，次のように考えた。
+・対策V-1については，表7項番3の機能で対応する。方式は，表2の(イ)の方式を採用する。
+・対策V-2については，S-APPLの脆弱性情報を収集し，脆弱性修正プログラムが公開されたら，それを適用する。
+・対策V-3については，表7項番1の機能で対応する。
+　T主任は，対策V-3のためのH社のネットワーク構成の変更案を作成した。なお，変更する際は，次の対応が必要になる。
+(1) VPN-HをS-APPLに置き換える。R-PCには，Sソフトを導入する。
+(2) R-PCごとのIDと秘密情報を，S-APPLとR-PCそれぞれに設定する。
+(3) VPN-Hに付与していたIPアドレスをS-APPLに付与する。
+(4) S-APPLのFQDNをDNSサーバに登録する。
+　T主任は，S-APPLの導入によってVPN-GWへの攻撃の対策が可能であることをL部長に説明した。L部長は，効果とリスクを検討した上で，S-APPLを導入することを決めた。
+
+〔DDoS攻撃に対する具体的対策の検討〕
+　T主任は，表4の項番3以外に対する具体的対策の検討に着手した。
+　まず，通信回線については，DDoS攻撃で大量のトラフィックが発生すると，使えなくなる。これについては，通信回線の帯域を大きくするという方法のほか，<u>⑤外部のサービスを利用するという方法</u>があることが分かった。
+　次に，サーバへの影響は，これまでに検討したUTMのIPS機能とWAF機能を有効化することで軽減できることが分かっている。加えて，取引先向けWebサーバについては，次の対応によって，<u>⑥更にDDoS攻撃の影響を軽減できる</u>ことが分かった。
+・取引先には，H社との取引専用のPC（以下，取引専用PCという）を貸与する。取引専用PCには，Sソフトを導入する。
+・取引専用PCごとのIDと秘密情報を，S-APPLと取引専用PCそれぞれに設定する。
+・S-APPLに，取引専用PCがVPN確立後にアクセス可能なサーバとして，取引先向けWebサーバだけを設定する。
+・UTMのファイアウォール機能で，インターネットから取引先向けWebサーバへの通信を拒否するように設定する。
+　その後，H社では，S-APPLの導入，UTMの設定変更，DNSサーバの変更などを行い，新たな運用を開始した。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　〔DDoS攻撃に対する調査〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 表4中の a に入れる攻撃の例を，H社での攻撃対象を示して具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="取引先向けWebサーバ又は公開Webサーバに，大量のHTTP GETリクエストを送り付ける。" data-alt=""><textarea maxlength="54" placeholder="45字程度"></textarea><span class="charcount">0/54</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線①の場合に発生する弊害を，25字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="正常な通信を遮断して，業務に支障が出る。" data-alt="誤検知が多発する。|正常な通信まで検知される。"><textarea maxlength="25" placeholder="25字以内"></textarea><span class="charcount">0/25</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(3) 本文中の b，c に入れる適切な字句を，“DNS-F”又は“DNS-K”から選び答えよ。</div>
+    <div class="field-row" data-label="b" data-answer="DNS-K" data-alt=""><textarea maxlength="6" placeholder="b"></textarea><span class="charcount">0/6</span></div>
+    <div class="field-row" data-label="c" data-answer="DNS-F" data-alt=""><textarea maxlength="6" placeholder="c"></textarea><span class="charcount">0/6</span></div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔対策V-1についての検討〕について答えよ。</h2>
+  <div class="qa-item" data-points="22">
+    <div class="q-text">(1) 表5中の d，e に入れる，不正な接続までの攻撃手順を，具体的に答えよ。</div>
+    <div class="field-row" data-label="d" data-answer="攻撃者が，入手した利用者IDとパスワードをVPNダイアログに入力して接続を試み，正規利用者のスマートフォンにセキュリティコードが送られる。" data-alt=""><textarea maxlength="70" placeholder="d"></textarea><span class="charcount">0/70</span></div>
+    <div class="field-row" data-label="e" data-answer="正規利用者が罠のサイトの画面に入力したセキュリティコードを，攻撃者が入手してセキュリティコード入力画面に入力する。" data-alt=""><textarea maxlength="70" placeholder="e"></textarea><span class="charcount">0/70</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線②について，注意喚起の内容を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="VPNの利用者IDとパスワードは，VPNクライアントソフトウェアのVPNダイアログだけに入力し，Webサイトの画面には入力しない。" data-alt=""><textarea maxlength="76" placeholder="60字程度"></textarea><span class="charcount">0/76</span></div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔対策V-3についての検討〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 本文中の下線③について，設定Pを突破する方法を，30字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="盗聴した順番どおりに，同じポートへ通信要求を送る。" data-alt="盗聴した通信要求を再送する。"><textarea maxlength="30" placeholder="30字以内"></textarea><span class="charcount">0/30</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(2) 本文中の下線④について，突破されないのはなぜか。40字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="盗聴したパケットを再送しても，同じランダムデータをもつので破棄されるから。" data-alt=""><textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span></div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4　〔DDoS攻撃に対する具体的対策の検討〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 本文中の下線⑤について，利用する外部のサービスを，20字以内で具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="クラウド型のDDoS攻撃対策サービス" data-alt="CDNサービス"><textarea maxlength="20" placeholder="20字以内"></textarea><span class="charcount">0/20</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の下線⑥について，軽減できる理由を，40字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="インターネットから取引先向けWebサーバに直接通信できなくなるから。" data-alt="VPN確立後のPCからしかサーバにアクセスできず，攻撃が届かないから。"><textarea maxlength="40" placeholder="40字以内"></textarea><span class="charcount">0/40</span></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。ネットワーク構成図などは文字による簡易表現です。<br>
+    ※ <b>模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。</b>採点後は，IPAが公表している解答例・採点講評と見比べてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="../assets/engine.js"></script>
+</body>
+</html>
