@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問4 Webアプリケーションプログラム｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問4　Webアプリケーションプログラム</h1>
+  <div class="meta">令和6年度 春期 情報処理安全確保支援士試験 午後問題　問4／全10設問</div>
+
+  <div class="mondai">Webアプリケーションプログラムに関する次の記述を読んで，設問に答えよ。
+
+　A社は，加工食品の製造・販売を行う従業員500名の会社である。問屋や直販店からの注文の受付けに，商品の注文と在庫を管理するシステム（以下，業務システムという）を利用している。業務システムは，A社内に設置したサーバ上に構築されている。
+　このたび，販売拡大を目指して，インターネットを使ったギフト販売を行うことになり，個人顧客から注文を受けるためのWebシステム（以下，Web受注システムという）を構築することになった。
+　A社はITベンダーのB社との間で開発の委託契約を締結し，両社はWeb受注システムの開発に着手した。
+
+〔Web受注システムの要件〕
+　Web受注システムの要件を表1に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>No.</th><th>要件名</th><th>要件内容</th></tr>
+<tr><td>1</td><td>機能</td><td>個人顧客が利用できる機能：商品検索，在庫照会，注文，決済，注文変更，注文キャンセル，注文照会，配送照会，ユーザー登録，ユーザー情報変更，パスワード変更，退会である。これら機能全てをアプリケーション（以下，AP）サーバに実装する。
+その他の機能：（省略）</td></tr>
+<tr><td>2</td><td>アクセス方式</td><td>Webブラウザからインターネット経由でアクセスして利用する。</td></tr>
+<tr><td>3</td><td>想定ユーザー</td><td>個人顧客</td></tr>
+<tr><td>4</td><td>想定ユーザー数</td><td>登録ユーザーの数が100,000まで想定</td></tr>
+<tr><td>5</td><td>重要情報（注1）に該当するデータ項目</td><td>氏名，住所，電話番号，メールアドレス，パスワード，銀行口座情報，決済情報</td></tr>
+<tr><td>6</td><td>商品数</td><td>1,000</td></tr>
+<tr><td>7</td><td>想定トランザクション数</td><td>注文：1,000件／日
+注文変更・注文キャンセル：各30件／日
+注文照会・配送照会：各2,000件／日</td></tr>
+<tr><td>8</td><td>稼働時間</td><td>24時間365日。ただし，メンテナンス時間は除く。</td></tr>
+<tr><td>9</td><td>メンテナンス時間</td><td>毎週月曜日0:00～5:00。ただし，緊急の脆弱性修正プログラム適用など，他の日時に臨時でメンテナンスを実施する場合もある。</td></tr>
+<tr><td>10</td><td>稼働率目標</td><td>99.9%。ただし，メンテナンス時間は除く。</td></tr>
+<tr><td>11</td><td>開発体制</td><td>A社とB社が協働で開発する。</td></tr>
+<tr><td>12</td><td>開発言語／DBMS</td><td>Java／RDBMS</td></tr>
+<tr><td>13</td><td>システム基盤</td><td>AP サーバ，バッチサーバ，ログサーバは，IaaS上に構築する。Web受注システムのデータベース（以下，データベースをDBという）は，クラウドサービスのマネージドDBを利用する。
+本番環境は，本番APサーバ，本番バッチサーバ，本番ログサーバ，本番DBで構成する。
+開発環境は，開発APサーバ，開発バッチサーバ，開発ログサーバ，開発DBで構成する。重要情報は保管されない。</td></tr>
+<tr><td>14</td><td>サーバOS</td><td>APサーバ，バッチサーバ，ログサーバのOSはLinuxを使用する。</td></tr>
+<tr><td>15</td><td>APログ（注2）</td><td>APサーバのプログラム及びバッチサーバのプログラムはAPログをログサーバに転送し，ログサーバはAPログをテキストファイル形式で保存する。</td></tr>
+<tr><td>16</td><td>APサーバの標準出力と標準エラー出力</td><td>APサーバの標準出力と標準エラー出力は，リダイレクトしてAPサーバの/var/log/serverlogディレクトリ配下のテキストファイルに出力する。なお，/var/log/serverlogディレクトリのオーナーはwebappuserであり，パーミッションは775（注3）とする。その配下のテキストファイルのオーナーはwebappuserであり，パーミッションは664（注3）とする。</td></tr>
+<tr><td>17</td><td>システム運用</td><td>システム運用はB社に委託し，システム運用担当者はB社の要員とする。重要情報の取扱いは重要情報取扱運用者だけとし，重要情報取扱運用者はA社での役職が管理職以上の要員とする。
+各サーバ及び各DBの管理はシステム管理責任者が行い，システム管理責任者はA社の情報システム部の管理職とする。</td></tr>
+<tr><td>18</td><td>システムのユーザーと役割</td><td>(1) 個人顧客
+　Web受注システムのAPサーバで注文，決済などを行う。
+(2) システム運用担当者
+　本番APサーバ及び本番バッチサーバの稼働を監視する。バッチ処理が異常終了したときは，手動で再実行する。これら以外のサーバについては，統合監視システムの画面から死活監視だけを行う。重要情報にアクセスしてはならない。
+(3) 重要情報取扱運用者
+　本番環境に保管されている重要情報を参照し，個人顧客からの問合せに対応する。
+(4) システム開発者
+　開発環境においてプログラムの開発・保守を行う。障害発生時は，本番ログサーバにアクセスして障害原因を調査する。重要情報にアクセスしてはならない。
+(5) システム管理責任者
+　各サーバのOS，ミドルウェアの脆弱性修正プログラムの適用などのメンテナンス作業を行う。各サーバのOSアカウントを管理する。各DBのアカウント管理を行う。</td></tr>
+<tr><td>19</td><td>パスワードの保存</td><td>パスワードは，CRYPTREC暗号リスト（令和5年3月30日版）の電子政府推奨暗号リストに記載されているハッシュ関数でハッシュ化してDBに保存する。</td></tr>
+</table>
+表1　Web受注システムの要件
+注1）A社では，扱う情報を“重要情報”と“その他の情報”に分類している。
+注2）システム稼働時に出力され，システム障害の際に，システム開発者が障害原因調査のために確認するファイルである。
+注3）chmodコマンドの絶対モードでLinuxのパーミッションを設定する。
+※令和6年7月19日の正誤表により，No.16のパーミッションを774から775に訂正している。
+
+〔Web受注システムの設計〕
+　A社とB社はWeb受注システムを設計した。
+　Web受注システムのサーバで定義されるOSアカウントの一覧を表2に，所属グループとその権限を表3に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>No.</th><th>ユーザーID</th><th>所属グループ</th><th>OSアカウントが定義されるサーバ</th><th>説明</th></tr>
+<tr><td>1</td><td>root</td><td>root</td><td>（省略）</td><td>システム管理責任者が利用する。</td></tr>
+<tr><td>2</td><td>operator</td><td>operation</td><td>（省略）</td><td>システム運用担当者が利用する。</td></tr>
+<tr><td>3</td><td>personal</td><td>personal</td><td>（省略）</td><td>重要情報取扱運用者が利用する。</td></tr>
+<tr><td>4</td><td>developer</td><td>develop</td><td>（省略）</td><td>システム開発者が利用する。</td></tr>
+<tr><td>5</td><td>batchappuser</td><td>operation</td><td>本番バッチサーバ</td><td>データ連携機能（注1）の各プログラムの実行に利用される。</td></tr>
+<tr><td>6</td><td>webappuser</td><td>personal</td><td>本番APサーバ</td><td>APサーバのプログラムの実行に利用される。</td></tr>
+</table>
+表2　OSアカウントの一覧
+注記　root，operation，personal，developという所属グループは各サーバに定義されている。
+注1）業務システムとWeb受注システムがデータ連携を行うための機能である。
+
+<table class="small-table" style="width:100%;">
+<tr><th>No.</th><th>所属グループ</th><th>権限</th></tr>
+<tr><td>1</td><td>root</td><td>特権ユーザーである。全てのアクセス権がある。</td></tr>
+<tr><td>2</td><td>operation</td><td>一般ユーザー権限である。本番APサーバと本番バッチサーバへのアクセス権がある。</td></tr>
+<tr><td>3</td><td>personal</td><td>一般ユーザー権限である。本番環境へのアクセス権がある。</td></tr>
+<tr><td>4</td><td>develop</td><td>一般ユーザー権限である。開発環境と本番ログサーバへのアクセス権がある。</td></tr>
+</table>
+表3　所属グループとその権限
+注記　Web受注システムでは，OSアカウントの権限を所属グループ単位で管理する。
+
+　業務システムとWeb受注システムは，CSV形式のデータ連携用ファイル（以下，CSVファイルという）でデータ連携を行う。1時間ごとに業務システムのバッチサーバとWeb受注システムのバッチサーバにおいてCSVファイルを作成し，HTTPSで他方のバッチサーバに送信し，他方のバッチサーバでは受信したCSVファイルを保存する。保存したCSVファイルを使用してWeb受注システム又は業務システムのDBに対して更新処理を実行する。更新処理後のCSVファイルは，障害発生に備えて1週間保存する。
+　データ連携機能のプログラム一覧を表4に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>No.</th><th>プログラム名</th><th>実行するサーバ</th><th>概要</th></tr>
+<tr><td>1</td><td>バッチ処理管理1</td><td>Web受注システムのバッチサーバ</td><td>Web受注システムの各バッチ処理のプログラムの起動，監視などを行う。</td></tr>
+<tr><td>2</td><td>バッチ処理管理2</td><td>業務システムのバッチサーバ</td><td>業務システムの各バッチ処理のプログラムの起動，監視などを行う。</td></tr>
+<tr><td>3</td><td>注文データCSV出力バッチ処理</td><td>Web受注システムのバッチサーバ</td><td>Web受注システムのDB内の注文テーブルから注文データを取得し，CSVファイルに出力する。</td></tr>
+<tr><td>4</td><td>注文データCSV取込みバッチ処理</td><td>業務システムのバッチサーバ</td><td>保存された注文データCSVファイルを読み込んで，業務システムのDBを更新する。</td></tr>
+<tr><td>5</td><td>在庫データCSV出力バッチ処理</td><td>業務システムのバッチサーバ</td><td>業務システムのDB内の在庫テーブルから在庫データを取得し，CSVファイルに出力する。</td></tr>
+<tr><td>6</td><td>在庫データCSV取込みバッチ処理</td><td>Web受注システムのバッチサーバ</td><td>保存された在庫データCSVファイルを読み込んで，Web受注システムのDBを更新する。</td></tr>
+<tr><td>7</td><td>データ送信1バッチ処理</td><td>Web受注システムのバッチサーバ</td><td>CSVファイルを業務システムのバッチサーバにHTTPSで送信する。</td></tr>
+<tr><td>8</td><td>データ送信2バッチ処理</td><td>業務システムのバッチサーバ</td><td>CSVファイルをWeb受注システムのバッチサーバにHTTPSで送信する。</td></tr>
+<tr><td>9</td><td>データ受信1バッチ処理</td><td>Web受注システムのバッチサーバ</td><td>受信したCSVファイルをWeb受注システムのバッチサーバの指定されたディレクトリに保存する。</td></tr>
+<tr><td>10</td><td>データ受信2バッチ処理</td><td>業務システムのバッチサーバ</td><td>受信したCSVファイルを業務システムのバッチサーバの指定されたディレクトリに保存する。</td></tr>
+</table>
+表4　データ連携機能のプログラム一覧
+
+　表4のうち，No.3のプログラムの内容を図1に示す。
+
+<div class="fbox">・注文テーブルの連携済フラグ（注1）が0である注文データを，CSVファイルとして平文で/var/dataディレクトリに出力する。なお，/var/dataディレクトリのオーナーはbatchappuserで，パーミッションは770（注2）とする。CSVファイルのオーナーはbatchappuserで，パーミッションは660（注2）とする。
+・注文テーブルの内容は，次のとおりである。
+  注文ID（注3），注文番号，注文ユーザーID，注文日時，決済金額，銀行コード，銀行支店コード，預金種別，銀行口座番号，銀行口座氏名，注文ステータス，お届け先郵便番号，お届け先住所，お届け先電話番号，お届け先氏名，送り主郵便番号，送り主住所，送り主電話番号，送り主氏名，連携済フラグ
+注1）“0”はCSVファイル出力前であることを，“1”はCSVファイル出力後であることを示す。
+注2）chmodコマンドの絶対モードでLinuxのパーミッションを設定する。
+注3）主キーである。</div>
+図1　No.3のプログラムの内容（抜粋）
+
+　Web受注システムの開発が進み，結合テスト前に，A社は，設計書とソースコードのセキュリティレビューを，セキュリティ専門会社のC社に委託した。C社の情報処理安全確保支援士（登録セキスペ）のE氏は，セキュリティレビューを実施した。
+
+〔データ連携機能のセキュリティレビュー〕
+　E氏は，表2～4及び図1の内容では表1の要件を満たしておらず，<span class="blank">a</span> がCSVファイルを閲覧できてしまうという問題を発見した。また，CSVファイルには重要情報が記録されるので，本番バッチサーバにアクセスできる者が不正に閲覧するリスクを軽減するための保険的対策も併せて実施することを提案した。具体的には，次のように提案した。
+(1) 問題に対しては，表2のbatchappuserについて，所属グループを <span class="blank">b</span> に変更する。
+(2) 保険的対策としては，表4のNo.3のプログラムに暗号化を行う処理を追加し，表4のNo. <span class="blank">c</span> のプログラムに復号を行う処理を追加する。
+　A社は，E氏の提案どおり修正することにした。
+
+〔ユーザー登録機能のセキュリティレビュー〕
+　ユーザー登録機能は，UserDataクラスによって実現している。UserDataクラスのプログラム仕様を図2に，UserDataクラスのソースコードを図3に示す。
+
+<div class="fbox">・addUserメソッドは，データをユーザーマスターテーブルに挿入する。
+・各インスタンス変数は，ユーザーマスターテーブルの各レコードに対応し，画面から入力された値をString型で保持する。
+・ユーザーマスターテーブルの列名は，次のとおりである。
+  ユーザーOID（注1），ユーザーID，パスワード（注2），氏名，郵便番号，住所，電話番号，メールアドレス，作成日時，更新日時
+注1）主キーである。オブジェクトIDであり，データを一意に識別する文字列が格納される。
+注2）パスワードのハッシュ値が格納される。</div>
+図2　UserDataクラスのプログラム仕様（抜粋）
+
+<div class="fbox code">  （省略）//package宣言，import宣言など
+ 1: public UserData(HttpServletRequest request) {
+ 2:   this.userId = request.getParameter("userId");
+ 3:   this.password = request.getParameter("password");
+    （省略）//入力値チェックなど
+ 4:   try {
+ 5:     MessageDigest mdObj = MessageDigest.getInstance("SHA-1");
+ 6:     byte[] hashByte = mdObj.digest(this.password.getBytes());
+ 7:     this.password = String.format("%x", new BigInteger(1, hashByte));
+ 8:   } catch (NoSuchAlgorithmException e) {
+ 9:     log.debug("error:" + e);
+10:   }
+    （省略）
+11: }
+    //引数connはDBコネクションオブジェクトを示す。
+12: public void addUser(Connection conn) {
+13:   PreparedStatement psObj;
+14:   String sql = "INSERT INTO USER_MASTER" +
+15:                "(USER_OID, USER_ID, PASSWORD, USER_NAME, ZIP_CODE" +
+        （省略）
+16:   try {
+17:     psObj = conn.prepareStatement(sql);
+18:     psObj.setString(1, this.userOid);
+19:     psObj.setString(2, this.userId);
+20:     psObj.setString(3, this.password);
+        （省略）
+        //次の2行はデバッグログの出力
+21:     System.out.println("SQL:" + sql);
+22:     System.out.println("InsertData:" + this.toString());
+        //次の2行はログサーバへのAPログの出力
+23:     log.debug("SQL:" + sql);
+24:     log.debug("InsertData:" + this.toString());
+25:     psObj.execute();
+26:     conn.commit();
+27:   } catch (SQLException e) {
+        （省略）//例外処理
+28:   }
+    （省略）
+29: }
+注記　log.debug()は，引数の文字列をログサーバに送信するメソッドである。</div>
+図3　UserDataクラスのソースコード（抜粋）
+
+　E氏は，図3のソースコードについて，次のように指摘した。
+・パスワードからハッシュ値を得るためのハッシュ関数が，表1の要件を満たしていない。
+・今後，メンテナンスなどで実行環境を変更した場合に，<span class="blank">d</span> 行目で <span class="blank">e</span> が発生すると，25，26行目では，パスワードが平文でユーザーマスターテーブルに保存されてしまう。
+・<u>①システム運用担当者とシステム開発者が，要件でアクセスが禁止されている情報にアクセスできてしまう</u>。
+・利用するAPサーバの実装では，変数psObjの指すメモリ領域においてメモリーリークが発生する可能性がある。
+　E氏の指摘を受け，システム開発者は，UserDataクラスのソースコードを修正した。修正後のUserDataクラスのソースコードを図4に示す。
+
+<div class="fbox code">  （省略）//package宣言，import宣言など
+ 1: public UserData(HttpServletRequest request) {
+ 2:   this.userId = request.getParameter("userId");
+ 3:   this.password = request.getParameter("password");
+    （省略）//入力値チェックなど
+ 4:   try {
+ 5:     MessageDigest mdObj = MessageDigest.getInstance("<span class="blank">f</span>");
+ 6:     byte[] hashByte = mdObj.digest(this.password.getBytes());
+ 7:     this.password = String.format("%x", new BigInteger(1, hashByte));
+ 8:   } catch (NoSuchAlgorithmException e) {
+ 9:     log.debug("error:" + e);
+    //回復不能な例外発生
+10:     <span class="blank">g</span>;
+11:   }
+    （省略）
+12: }
+    //引数connはDBコネクションオブジェクトを示す。
+13: public void addUser(Connection conn) {
+14:   PreparedStatement psObj = null;
+15:   String sql = "INSERT INTO USER_MASTER" +
+16:                "(USER_OID, USER_ID, PASSWORD, USER_NAME, ZIP_CODE" +
+        （省略）
+17:   try {
+18:     psObj = conn.prepareStatement(sql);
+19:     psObj.setString(1, this.userOid);
+20:     psObj.setString(2, this.userId);
+21:     psObj.setString(3, this.password);
+        （省略）
+22:     UserData userMaskDataObj = this.maskUserData(this);
+        //次の2行はログサーバへのAPログの出力
+23:     log.debug("SQL:" + sql);
+24:     log.debug("InsertData:" + userMaskDataObj.toString());
+25:     psObj.execute();
+26:     conn.commit();
+27:   } catch (SQLException e) {
+        （省略）//例外処理
+28:   } <span class="blank">h</span> {
+29:     if (psObj != null) {
+30:       try {
+31:         psObj.close();
+32:       } catch (SQLException e) {
+          （省略）//例外処理
+33:       }
+34:     }
+35:   }
+    （省略）
+36: }
+37: private UserData maskUserData(UserData inUserData) {
+      （省略）//UserData内の重要情報を含む変数の値を＊に置換する。
+38:   return userMaskDataObj;
+39: }
+    （省略）</div>
+図4　修正後のUserDataクラスのソースコード（抜粋）
+
+　図4のソースコードについて，E氏は，セキュリティレビューを再度実施した。
+　E氏は，図4のソースコードでは，レインボーテーブル攻撃を受けたときに攻撃が成立してしまうので，図2の仕様及び<u>②図4のソースコードの6，7行目を修正すべき</u>であると指摘した。
+　A社は，E氏の指摘の対応を完了した。その後，テストを実施し，Web受注システムをリリースした。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　〔データ連携機能のセキュリティレビュー〕について答えよ。</h2>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(1) 本文中の a に入れる適切な字句を，解答群の中から選び，記号で答えよ。<br>解答群　ア システム運用担当者／イ システム運用担当者とシステム開発者／ウ システム開発者／エ システム開発者と重要情報取扱運用者／オ 重要情報取扱運用者</div>
+    <div class="field-row" data-label="" data-answer="ア" data-alt=""><textarea maxlength="3" placeholder="記号"></textarea><span class="charcount">0/3</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(2) 本文中の b に入れる適切な所属グループを，表3中から選び答えよ。</div>
+    <div class="field-row" data-label="" data-answer="personal" data-alt=""><textarea maxlength="10" placeholder="所属グループ"></textarea><span class="charcount">0/10</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(3) 本文中の c に入れる適切なプログラムを，表4中から選び，No.列の番号で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="4" data-alt="No.4"><textarea maxlength="5" placeholder="番号"></textarea><span class="charcount">0/5</span></div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔ユーザー登録機能のセキュリティレビュー〕について答えよ。（IPAの追記により(3)の一部が不成立となったため，(3)はシステム開発者についてのみ出題する。）</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 本文中の d に入れる適切な行番号を，図3中から選び，答えよ。</div>
+    <div class="field-row" data-label="" data-answer="5" data-alt="5行目"><textarea maxlength="3" placeholder="行番号"></textarea><span class="charcount">0/3</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(2) 本文中の e に入れる適切な字句を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="NoSuchAlgorithmException" data-alt="例外|NoSuchAlgorithmException例外"><textarea maxlength="30" placeholder="字句"></textarea><span class="charcount">0/30</span></div>
+  </div>
+  <div class="qa-item" data-points="16">
+    <div class="q-text">(3) 本文中の下線①について，システム開発者が，アクセスが禁止されているのにアクセスできてしまう情報は何か。図2中のユーザーマスターテーブルの列名で，それぞれ全て答えよ。また，その情報が出力される場所を，解答群の中から選び，記号で答えよ。<br>解答群　ア 開発ログサーバのAPログを保存したテキストファイル／イ 本番APサーバの/sbinディレクトリ配下のバイナリファイル／ウ 本番APサーバの/var/dataディレクトリ配下のCSVファイル／エ 本番APサーバの/var/log/serverlogディレクトリ配下のテキストファイル／オ 本番ログサーバのAPログを保存したテキストファイル</div>
+    <div class="field-row" data-label="列名" data-answer="氏名，住所，電話番号，メールアドレス，パスワード" data-alt=""><textarea maxlength="40" placeholder="列名を全て"></textarea><span class="charcount">0/40</span></div>
+    <div class="field-row" data-label="場所" data-answer="オ" data-alt=""><textarea maxlength="3" placeholder="記号"></textarea><span class="charcount">0/3</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(4) 図4中の f に入れる適切な字句を答えよ。</div>
+    <div class="field-row" data-label="" data-answer="SHA-256" data-alt="SHA-384|SHA-512|SHA3-256|SHA3-384|SHA3-512"><textarea maxlength="10" placeholder="字句"></textarea><span class="charcount">0/10</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(5) 図4中の g に入れる適切な処理を，ソースコード又は具体的な処理内容のいずれかで答えよ。</div>
+    <div class="field-row" data-label="" data-answer="throw new RuntimeException(e)" data-alt="例外を再スローして処理を中断する。|throw new Exception(e)"><textarea maxlength="40" placeholder="ソースコード又は処理内容"></textarea><span class="charcount">0/40</span></div>
+  </div>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(6) 図4中の h に入れる適切なソースコードを答えよ。</div>
+    <div class="field-row" data-label="" data-answer="finally" data-alt=""><textarea maxlength="10" placeholder="ソースコード"></textarea><span class="charcount">0/10</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(7) 本文中の下線②について，図4の6，7行目をどのように修正すればよいか。修正後の適切なソースコードを解答群の中から選び，記号で答えよ。ここで，変数saltには，addUserメソッドの呼出しごとに異なる32バイトの固定長文字列が入っているものとし，ユーザーマスターテーブルの定義に変更ないものとする。<br>ア：hashByte = mdObj.digest((salt + this.password).getBytes()); this.password = salt + String.format("%x", new BigInteger(1, hashByte));<br>イ：hashByte = mdObj.digest((salt + this.password).getBytes()); this.password = String.format("%x", new BigInteger(1, hashByte));<br>ウ：hashByte = mdObj.digest(this.password.getBytes()); saltByte = mdObj.digest(salt.getBytes()); this.password = String.format("%x", new BigInteger(1, hashByte)) + String.format("%x", new BigInteger(1, saltByte));<br>エ：hashByte = mdObj.digest(this.password.getBytes()); this.password = salt + String.format("%x", new BigInteger(1, hashByte));<br>オ：hashByte = mdObj.digest(this.password.getBytes()); this.password = String.format("%x", new BigInteger(1, hashByte)); saltHashByte = mdObj.digest((salt + this.password).getBytes()); this.password = String.format("%x", new BigInteger(1, saltHashByte));</div>
+    <div class="field-row" data-label="" data-answer="ア" data-alt=""><textarea maxlength="3" placeholder="記号"></textarea><span class="charcount">0/3</span></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。ネットワーク構成図などは文字による簡易表現です。<br>
+    ※ <b>模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。</b>採点後は，IPAが公表している解答例・採点講評と見比べてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="../assets/engine.js"></script>
+</body>
+</html>
