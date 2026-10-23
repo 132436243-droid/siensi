@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>問3 Webセキュリティ｜情報処理安全確保支援士 午後問題演習</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="index.html">← 問題一覧に戻る</a>
+  <h1>問3　Webセキュリティ</h1>
+  <div class="meta">令和6年度 春期 情報処理安全確保支援士試験 午後問題　問3／全10設問</div>
+
+  <div class="mondai">Webセキュリティに関する次の記述を読んで，設問に答えよ。
+
+　D社は，従業員1,000名の小売業である。自社のホームページやECサイトなどのWebサイトについては，Webアプリケーションプログラム（以下，Webアプリという）に対する診断（以下，Webアプリ診断という）を専門会社のZ社に委託して実施している。Webアプリ診断は，Webサイトのリリース前だけではなく，リリース後も定期的に実施している。Z社のWebアプリ診断は，脆弱性診断ツールによるスキャンだけではなく，手動による高度な分析も行う。
+
+〔新たなWebサイトの構築〕
+　D社では，新たにECサイト（以下，サイトXという）と商品企画サイトY（以下，サイトYという）をW社が提供するクラウドサービス（以下，クラウドWという）上に構築することになった。
+　サイトXでは，D社が取り扱う商品をインターネットを介して会員に販売する予定である。取引は毎月10,000件ほどを見込んでいる。サイトYでは，サイトXで販売する新商品の企画・開発を顧客参加型で行う。サイトXとサイトYは，いずれもWebサーバとデータベースサーバ（以下，DBサーバという）で構成される。Webサーバについてはクラウド Wの仮想Webサーバサービスを利用し，DBサーバについてはクラウドWのリレーショナルデータベースサービスを利用する。サイトXとサイトYはいずれも，コンテンツマネジメントシステム（以下，CMSという）を使って構築される。サイトXとサイトYにはいずれも，Webアプリ，HTMLによる静的コンテンツ，DBサーバに格納したデータを使った動的コンテンツなどを用意する。
+　D社は，V大学と新商品開発の共同研究を行っている。新商品開発の共同研究では，V大学が運用する情報交換サイト（以下，サイトPという）を利用している。サイトYは，サイトPで取り扱っている情報などを表示する。
+　D社は，Webサイト構築に関連するデータやドキュメントの保存場所として，クラウドWのストレージサービス（以下，ストレージWという）を利用する。
+　D社は，サイトX及びサイトYの設計書を作成した。設計書のうち，サイトX，サイトY及びサイトPのネットワーク構成を図1に，サーバやサービスの説明を図2に示す。
+
+<div class="diag">【クラウドW】 VPC（仮想プライベートクラウド）内に，サイトX（Webサーバ X，DBサーバ X），サイトY（Webサーバ Y，DBサーバ Y），IMDS（インスタンスメタデータサービス）
+　VPC ─ IG（インターネットゲートウェイ）─ インターネット　　VPC ─ VG（VPNゲートウェイ）─ D社の内部ネットワーク（D社管理PC）
+　ストレージW ─ インターネット
+【V大学】 FW ─ Webサーバ P，DBサーバ P（サイトP） ─ 学内ネットワーク
+注1）IG：VPCとインターネットとの間の通信を可能にする。　注2）VG：VPCとD社の内部ネットワークとの間のVPN通信を可能にする。
+FW：ファイアウォール　IMDS：インスタンスメタデータサービス　VPC：仮想プライベートクラウド</div>
+図1　サイトX，サイトY及びサイトPのネットワーク構成
+
+<div class="fbox">［クラウドWにあるサーバ及びストレージWについて］
+　クラウドW上のサービスの管理のためのアクセスの際は，クラウドW用の利用者ID，アクセスキーなどのクレデンシャル情報をリクエストに含める必要がある。D社が利用するクラウドW上のサービスには，D社用に発行されたクレデンシャル情報でアクセスでき，全ての操作ができる。
+
+［IMDSについて］
+　IMDSは，VPC内の各サーバから特定のURLにアクセスされると特定の情報を返す。例えば，https://○○○.○○○.○○○.○○○/meta-data/credentialにGETメソッドでアクセスされると，クラウドW上のサービスのクレデンシャル情報を返す。IMDSには，インターネットから直接アクセスできないプライベートIPアドレス（○○○.○○○.○○○.○○○）が設定されている。
+　IMDSにアクセスする方式は，次のいずれかを採用する必要がある。D社では，方式1を採用する。
+ 方式1：特定のURLにアクセスするだけで情報を取得できる。
+ 方式2：トークンを発行するURLにPUTメソッドでアクセスし，レスポンスボディに含まれるトークンを入手してから，そのトークンをリクエストヘッダに含めて特定のURLにアクセスすると情報を取得できる。
+
+［CMSについて］
+　Webサーバ Xはhttps://□□□.jp/admin又はWebサーバ Yはhttps://■■■.jp/adminにアクセスすると，それぞれのサーバのCMSの管理ログイン画面にアクセスできる。ログインは，POSTメソッドでは許可されるが，GETメソッドでは許可されない。各CMSの管理ログイン画面へのアクセスは，VPN接続されたD社管理PC，又はVPC内からのアクセスだけに制限される。D社では，各CMSの管理者アカウントは初期パスワードのまま運用する。</div>
+図2　サーバやサービスの説明
+
+〔サイトX〕
+　サイトXには，会員用の利用者アカウントとD社管理者用の利用者アカウントがある。サイトXのログインセッション管理は，cookieパラメータのSESSIONIDで行う。SESSIONIDには，値とSecure属性だけがセットされる。なお，サーバ側のセッション の有効期間は24時間である。設計書のうち，サイトXの機能一覧を表1に示す。
+
+<table class="small-table" style="width:100%;">
+<tr><th>項番</th><th>機能</th><th>詳細機能</th><th>機能概要</th></tr>
+<tr><td>1</td><td>ログイン機能</td><td>ログイン機能</td><td>利用者IDとパスワードを入力し，ログインに成功すると利用できる機能が表示されるページに遷移する。</td></tr>
+<tr><td>2</td><td>利用者機能（ログイン前）</td><td>会員機能（登録）</td><td>登録画面では最初にメールアドレスを入力する。そのメールアドレス宛てに送られた電子メールに記載されたURLにアクセスして利用者情報を入力し，登録する。</td></tr>
+<tr><td>3</td><td>利用者機能（ログイン後）</td><td>注文機能（商品検索，注文，注文履歴閲覧）</td><td>商品には商品コードが付与されており，商品検索画面で検索できる。注文履歴は，注文年月とランダムな英大文字6桁の値をハイフンでつなげた注文管理番号で管理される。注文履歴を閲覧する際は，注文管理番号を基に検索できる。</td></tr>
+<tr><td>4</td><td></td><td>会員機能（編集）</td><td>登録した利用者情報を編集できる。</td></tr>
+<tr><td>5</td><td></td><td>問合せ機能</td><td>問合せ情報を入力できる。入力した問合せ情報は，数字10桁の管理番号が発番され，管理される。</td></tr>
+<tr><td>6</td><td>サイト管理機能（ログイン後）</td><td>商品管理機能（登録，編集，削除）</td><td>商品情報を登録，編集，削除できる。商品情報が登録されると，数字10桁の商品コードが割り当てられ，その商品を会員が注文できるようになる。</td></tr>
+<tr><td>7</td><td></td><td>売上管理機能（売上情報閲覧，検索）</td><td>商品の売上情報を閲覧できる。また，条件を指定して検索することができる。</td></tr>
+<tr><td>8</td><td></td><td>会員管理機能（閲覧，変更，削除）</td><td>登録された会員の利用者情報を閲覧，変更，削除できる。</td></tr>
+<tr><td>9</td><td></td><td>問合せ管理機能</td><td>問合せ機能で入力された問合せ情報が閲覧できる。</td></tr>
+</table>
+表1　サイトXの機能一覧（抜粋）
+
+　サイト管理機能は，D社の内部ネットワーク以外からも利用する可能性があり，サイトXでは，接続元の制限は行わない。
+　サイトXとサイトYの構築は順調に進み，D社はリリース前のWebアプリ診断をZ社に委託した。Z社は，サイトXとサイトYそれぞれに対してWebアプリ診断を実施した。
+
+〔サイトXに対するWebアプリ診断〕
+　サイトXに対するWebアプリ診断では，次の三つの脆弱性が検出された。
+・クロスサイトスクリプティング（以下，XSSという）
+・クロスサイトリクエストフォージェリ（以下，CSRFという）
+・認可制御の不備
+
+〔XSSについて〕
+　Z社がXSSを検出した経緯は，次のとおりであった。
+(1) 問合せ機能で，脆弱性診断ツールによるリクエストとレスポンスを確認した。このときのリクエストとレスポンスは，図3のとおりであった。
+
+<div class="fbox code">［リクエスト］
+POST /shop/contact HTTP/1.1
+Host: （省略）
+（省略）
+Content-Type: application/x-www-form-urlencoded
+Content-Length: （省略）
+Cookie: SESSIONID=nt1t3dmxmlmwuicyiz3h4nq1
+
+subject_id=004&amp;name=%22%3e%3cscript%3ealert%281%29%3c%2fscript%3e%3c%22&amp;tel= （省略）&amp; mail= （省略）&amp;mail2= （省略）&amp;comment= （省略）
+
+［レスポンス］
+（省略）
+&lt;h1&gt;問合せを受け付けました。&lt;/h1&gt;
+（省略）
+注記　パラメータnameの値は "&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;" をURLエンコードした値である。</div>
+図3　問合せ機能のリクエストとレスポンス
+
+(2) 図3中のレスポンスボディには，問合せ機能で入力した値は出力されていない。しかし，Z社は，<u>①設計書を調査した上で手動による分析を行い，図3中のリクエスト内のスクリプトが別の機能の画面に出力されることを確認した</u>。
+　Z社は，<u>②攻撃者がこのXSSを悪用してサイトX内の全会員の利用者情報を取得する可能性がある</u>と説明した。
+
+〔CSRFについて〕
+　Z社がCSRFを検出した経緯は，次のとおりであった。
+(1) 会員機能（編集）において，図4に示すリクエストを送ってその応答を確認した。リクエストは正常に処理された。
+
+<div class="fbox code">POST /shop/editmember HTTP/1.1
+Host: （省略）
+（省略）
+Content-Type: application/x-www-form-urlencoded
+Content-Length: （省略）
+Cookie: SESSIONID=b9y33f89umt6uualpe4j4jn7
+
+sei=sato&amp;mei=taro&amp;mail=aaa%40example.jp&amp;csrf_token=KCRQ88ERH2G8MGT319E5OSMOAJFDIVEM</div>
+図4　会員機能（編集）のリクエスト
+
+(2) リクエスト内のメッセージボディの一部を変更して送り，その応答を確認した。リクエスト内のメッセージボディと応答は表2のとおりであった。
+
+<table class="small-table" style="width:100%;">
+<tr><th>手順</th><th>リクエスト内のメッセージボディ</th><th>応答</th></tr>
+<tr><td>1</td><td>sei=sato&amp;mei=taro&amp;mail=aaa%40example.jp&amp;csrf_token=</td><td>エラー</td></tr>
+<tr><td>2</td><td>sei=sato&amp;mei=taro&amp;mail=aaa%40example.jp</td><td>エラー</td></tr>
+<tr><td>3</td><td>sei=sato&amp;mei=taro&amp;mail=aaa%40example.jp&amp;csrf_token=（異なる利用者アカウントで取得したcsrf_tokenの値）</td><td>正常に処理</td></tr>
+</table>
+表2　リクエスト内のメッセージボディと応答
+
+(3) Z社は，手順1，2の応答が“エラー”であることから一定のCSRF対策ができているが，手順3の応答が“正常に処理”であることから<u>③利用者に被害を与える可能性があると判断した</u>。
+　Z社は，対策には二つの方法があることを説明した。
+・csrf_tokenの処理の修正
+・cookieへのSameSite属性の追加
+　サイトXの構成次第では，SameSite属性をcookieに付与することも有効な対策となり得る。SameSite属性は，Strict，Lax，Noneの三つの値のうちのいずれかを取る。サイトXにログインした利用者のWebブラウザにおいて，サイトX内で遷移する場合と外部Webサイトからサイト Xに遷移する場合では，SameSite属性の値によってサイトXのcookie送信の有無が表3のように異なる。
+
+<table class="small-table" style="width:100%;">
+<tr><th>SameSite属性の値</th><th>サイトX内で遷移 GET</th><th>サイトX内で遷移 POST</th><th>外部WebサイトからサイトXに遷移 GET</th><th>外部WebサイトからサイトXに遷移 POST</th></tr>
+<tr><td>Strict</td><td>○</td><td>○</td><td><span class="blank">a</span></td><td><span class="blank">b</span></td></tr>
+<tr><td>Lax</td><td>○</td><td>○</td><td><span class="blank">c</span></td><td><span class="blank">d</span></td></tr>
+<tr><td>None</td><td>○</td><td>○</td><td>（省略）</td><td>（省略）</td></tr>
+</table>
+表3　SameSite属性の値の違いによるcookie送信の有無
+注記　“○”はcookieが送られることを，“×”はcookieが送られないことを示す。
+
+〔認可制御の不備について〕
+　Z社が認可制御の不備を検出した経緯は，次のとおりであった。
+(1) Z社は，利用者α，利用者βという二つの利用者アカウントを用いて，注文履歴を閲覧した際のリクエストを確認した。注文履歴を閲覧した際のリクエストを図5及び図6に示す。
+
+<div class="fbox code">POST /shop/order-history HTTP/1.1
+Host: （省略）
+（省略）
+Content-Type: application/x-www-form-urlencoded
+Content-Length: （省略）
+Cookie: SESSIONID=ac9t66bxlxmwuiiki53h4nq3
+
+order-code=202404-AHUJKI（注1）
+注1）表1の注文管理番号のことである。値から利用者を特定することができる。</div>
+図5　利用者αで注文履歴を閲覧した際のリクエスト
+
+<div class="fbox code">POST /shop/order-history HTTP/1.1
+Host: （省略）
+（省略）
+Content-Type: application/x-www-form-urlencoded
+Content-Length: （省略）
+Cookie: SESSIONID=k1ctghbxbx5muj3ki33hlnq5
+
+order-code=202404-BAKCXW</div>
+図6　利用者βで注文履歴を閲覧した際のリクエスト
+
+(2) 図5のリクエストのパラメータorder-codeの値を図6中の値に改変してリクエストを送った。
+(3) 利用者αが，本来は閲覧できないはずの利用者βの注文履歴を閲覧できるという攻撃が成功することを確認した。
+(4) さらに，ある利用者がほかの利用者が注文した際のorder-codeを知らなくても，<u>④ある攻撃手法を用いれば攻撃が成功する</u>ことを確認した。
+　Z社は，<u>⑤サイトXのWebアプリに追加すべき処理</u>を説明した。
+
+〔サイトYに対するWebアプリ診断〕
+　サイトYに対するWebアプリ診断では，次の脆弱性が検出された。
+・サーバサイドリクエストフォージェリ（以下，SSRFという）
+
+〔SSRFについて〕
+　Z社がSSRFを検出した経緯は，次のとおりであった。
+(1) サイトPの新着情報を取得する際に，利用者のWebブラウザがWebサーバYに送るリクエストを確認したところ，図7のとおりであった。
+
+<div class="fbox code">GET /top?page=https://△△△.jp/topic/202404.html HTTP/1.1
+Host: （省略）
+（省略）
+Cookie: SESSIONID=pq4ikd31op215jebter41sae
+注記　△△△.jpはサイトPのFQDNである。</div>
+図7　利用者のWebブラウザがWebサーバYに送るリクエスト
+
+(2) <u>⑥図7のリクエストのパラメータの値をWebサーバYのCMSの管理ログイン画面のURLに変更することで，その画面にアクセスできるが，ログインはできない</u>ことを確認した。
+(3) <u>⑦図7のリクエストのパラメータの値を別のURLに変更するという方法（以下，方法Fという）</u>でSSRFを悪用して，クレデンシャル情報を取得し，ストレージWから情報を盗み出すことができることを確認した。
+(4) IMDSにアクセスする方式を方式1から方式2に変更すると，方法Fではクレデンシャル情報を取得できないので，ストレージWから情報を盗み出すことができない。しかし，図7のリクエストのパラメータの値を変更することで，WebサーバYから送られるリクエストに任意のメソッドの指定及び任意のヘッダの追加ができる方法（以下，方法Gという）がある。方法Gを用いれば，方式2に変更しても，<u>⑧クレデンシャル情報を取得し，ストレージWから情報を盗み出すことができる</u>ことを確認した。
+　Z社は，クラウドW上のネットワークでのアクセス制御の設定，及び<u>⑨サイトYのWebアプリに追加すべき処理</u>を提案した。
+　リリース前の脆弱性診断で検出された脆弱性の対策が全て完了し，サイトXとサイトYは稼働を開始した。</div>
+
+  <div class="meta" style="margin-top:-14px;">💡 本文中の気になる箇所をドラッグで選択すると，マーカーの色を選べます（引いたマーカーはクリックで消去できます）。</div>
+
+  <!-- ========== 設問1 ========== -->
+  <h2 class="setumon">設問1　〔XSSについて〕について答えよ。</h2>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(1) 本文中の下線①について，図3中のリクエスト内のスクリプトが出力されるのはどの機能か。表1の詳細機能に対する項番を選び答えよ。</div>
+    <div class="field-row" data-label="" data-answer="9" data-alt="項番9"><textarea maxlength="5" placeholder="項番"></textarea><span class="charcount">0/5</span></div>
+  </div>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(2) 本文中の下線②について，攻撃者はどのような手順で利用者情報を取得するか。具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="攻撃者が問合せ機能にcookieを送信するスクリプトを入力し，管理者が問合せ管理機能で閲覧して実行されたとき，管理者のSESSIONIDを入手して管理者になりすまし，会員管理機能で全会員の情報を閲覧する。" data-alt=""><textarea maxlength="119" placeholder="100字程度"></textarea><span class="charcount">0/119</span></div>
+  </div>
+
+  <!-- ========== 設問2 ========== -->
+  <h2 class="setumon">設問2　〔CSRFについて〕について答えよ。</h2>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(1) 本文中の下線③について，被害を与える攻撃の手順を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="攻撃者が自身のアカウントのcsrf_tokenを含む変更リクエストを送る罠サイトを用意し，ログイン中の利用者が閲覧すると，利用者の会員情報が書き換えられる。" data-alt=""><textarea maxlength="80" placeholder="80字程度"></textarea><span class="charcount">0/80</span></div>
+  </div>
+  <div class="qa-item" data-points="12">
+    <div class="q-text">(2) 表3中の a ～ d に入れる適切な内容を，“○”又は“×”から選び答えよ。</div>
+    <div class="field-row" data-label="a" data-answer="×" data-alt=""><textarea maxlength="2" placeholder="a"></textarea><span class="charcount">0/2</span></div>
+    <div class="field-row" data-label="b" data-answer="×" data-alt=""><textarea maxlength="2" placeholder="b"></textarea><span class="charcount">0/2</span></div>
+    <div class="field-row" data-label="c" data-answer="○" data-alt=""><textarea maxlength="2" placeholder="c"></textarea><span class="charcount">0/2</span></div>
+    <div class="field-row" data-label="d" data-answer="×" data-alt=""><textarea maxlength="2" placeholder="d"></textarea><span class="charcount">0/2</span></div>
+  </div>
+
+  <!-- ========== 設問3 ========== -->
+  <h2 class="setumon">設問3　〔認可制御の不備について〕について答えよ。</h2>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(1) 本文中の下線④について，どのような攻撃手法を用いれば攻撃が成功するか。30字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="order-codeの英大文字6桁を総当たりで試行する。" data-alt="ブルートフォース攻撃を行う。"><textarea maxlength="30" placeholder="30字以内"></textarea><span class="charcount">0/30</span></div>
+  </div>
+  <div class="qa-item" data-points="14">
+    <div class="q-text">(2) 本文中の下線⑤について，サイトXのWebアプリに追加すべき処理を，60字以内で具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="注文履歴の閲覧時に，ログイン中の利用者と注文管理番号の注文者が一致するか確認し，一致しなければ拒否する。" data-alt=""><textarea maxlength="60" placeholder="60字以内"></textarea><span class="charcount">0/60</span></div>
+  </div>
+
+  <!-- ========== 設問4 ========== -->
+  <h2 class="setumon">設問4　〔SSRFについて〕について答えよ。</h2>
+  <div class="qa-item" data-points="6">
+    <div class="q-text">(1) 本文中の下線⑥について，ログインができないのはなぜか。SSRF攻撃の特徴を基に35字以内で答えよ。</div>
+    <div class="field-row" data-label="" data-answer="SSRFではGETしか送れず，ログインにはPOSTが必要だから。" data-alt=""><textarea maxlength="35" placeholder="35字以内"></textarea><span class="charcount">0/35</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(2) 本文中の下線⑦について，クレデンシャル情報を取得する方法を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="パラメータの値を，IMDSのクレデンシャル情報を返すURL（meta-data/credential）に変更する。" data-alt=""><textarea maxlength="67" placeholder="50字程度"></textarea><span class="charcount">0/67</span></div>
+  </div>
+  <div class="qa-item" data-points="10">
+    <div class="q-text">(3) 本文中の下線⑧について，方法Gを用いてクレデンシャル情報を取得する方法を，具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="PUTメソッドでトークン発行URLにアクセスさせてトークンを入手し，そのトークンをヘッダに付けてクレデンシャルのURLにアクセスさせる。" data-alt=""><textarea maxlength="70" placeholder="70字程度"></textarea><span class="charcount">0/70</span></div>
+  </div>
+  <div class="qa-item" data-points="8">
+    <div class="q-text">(4) 本文中の下線⑨について，サイトYのWebアプリに追加すべき処理を，35字以内で具体的に答えよ。</div>
+    <div class="field-row" data-label="" data-answer="pageの値が許可したURLか検証し，それ以外は拒否する。" data-alt=""><textarea maxlength="35" placeholder="35字以内"></textarea><span class="charcount">0/35</span></div>
+  </div>
+
+  <button id="gradeBtn">採点する</button>
+  <div id="scoreSummary"></div>
+
+  <div class="note">
+    ※ 図・表は本文中に直接埋め込んでいます（画像ファイルは使用していません）。ネットワーク構成図などは文字による簡易表現です。<br>
+    ※ <b>模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。</b>採点後は，IPAが公表している解答例・採点講評と見比べてください。<br>
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。
+  </div>
+
+</div>
+<script src="../assets/engine.js"></script>
+</body>
+</html>
