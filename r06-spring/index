@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情報処理安全確保支援士 午後問題演習｜令和6年度 春期</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="backlink" href="../index.html">← 年度一覧に戻る</a>
+  <h1>情報処理安全確保支援士試験 午後問題 演習</h1>
+  <div class="meta">令和6年度 春期／過去問4問（本試験は2問選択）</div>
+
+  <ul class="q-list">
+    <li><a href="q1.html">問1　APIセキュリティ</a>
+      <div class="desc">全3設問／JWT・認証APIの脆弱性診断結果と対策，WAFルールの設計，ライブラリの脆弱性への対応</div>
+    </li>
+    <li><a href="q2.html">問2　サイバー攻撃への対策</a>
+      <div class="desc">全4設問／DDoS攻撃・DNS構成，多要素認証を狙った攻撃，ポートノッキングとSPA</div>
+    </li>
+    <li><a href="q3.html">問3　Webセキュリティ</a>
+      <div class="desc">全4設問／格納型XSS，CSRF対策とSameSite属性，認可制御の不備，SSRFとIMDS</div>
+    </li>
+    <li><a href="q4.html">問4　Webアプリケーションプログラム</a>
+      <div class="desc">全2設問（設問2(3)は除外）／OSアカウントとパーミッション，ハッシュ関数・例外処理・ソルトのソースコードレビュー</div>
+    </li>
+  </ul>
+
+  <div class="note">
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。<br>
+    ※ 各設問の記述式解答は文字集合ベースの類似度採点（参考実装）であり，公式の採点基準とは異なります。<br>※ 問4は令和6年7月19日のIPA正誤表を反映しています（表1 No.16のパーミッションは775）。設問2(3)はIPAの追記により一部不成立のため，システム開発者についてだけ出題しています。<br>※ 模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。<br>
+  </div>
+</div>
+</body>
+</html>
