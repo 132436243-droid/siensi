@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>情報処理安全確保支援士 午後問題演習｜令和6年度 秋期</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="backlink" href="../index.html">← 年度一覧に戻る</a>
+  <h1>情報処理安全確保支援士試験 午後問題 演習</h1>
+  <div class="meta">令和6年度 秋期／過去問4問（本試験は2問選択）</div>
+
+  <ul class="q-list">
+    <li><a href="q1.html">問1　インシデントレスポンス</a>
+      <div class="desc">全2設問／証拠収集ツールの出力ログ読解，マルウェア感染拡大の調査と暫定対策</div>
+    </li>
+    <li><a href="q2.html">問2　ドメイン名変更</a>
+      <div class="desc">全5設問／第三者中継防止，DKIM・DMARC・SPFの設定，メーリングリスト利用時の認証失敗</div>
+    </li>
+    <li><a href="q3.html">問3　クレジットカード情報の漏えい</a>
+      <div class="desc">全3設問／アクセスログ読解，customize.jsの置換えによる偽フォーム表示，被害者候補の特定</div>
+    </li>
+    <li><a href="q4.html">問4　セキュリティ診断</a>
+      <div class="desc">全3設問／診断報告書の読解，セッションフィクセーション・メールヘッダーインジェクション，仕様の改善案</div>
+    </li>
+  </ul>
+
+  <div class="note">
+    ※ 採点はすべてブラウザ内（クライアントサイドJS）で完結しており，サーバ通信は行いません。<br>
+    ※ 各設問の記述式解答は文字集合ベースの類似度採点（参考実装）であり，公式の採点基準とは異なります。<br>※ 模範解答はIPA公式の解答例ではなく，問題文から作成した参考解答です。<br>
+  </div>
+</div>
+</body>
+</html>
