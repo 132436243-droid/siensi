@@ -123,7 +123,12 @@ function initGrading() {
       totalScore += earned;
       totalMax += points;
 
-      const resultBox = item.querySelector(".result-box");
+      let resultBox = item.querySelector(".result-box");
+      if (!resultBox) {                       // HTML側に結果欄が無い場合は自動作成
+        resultBox = document.createElement("div");
+        resultBox.className = "result-box";
+        item.appendChild(resultBox);
+      }
       resultBox.className = "result-box show " + worstGrade;
       resultBox.innerHTML =
         `<div class="score-line">${earned} / ${points} 点</div>` + resultHtml;
