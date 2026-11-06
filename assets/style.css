@@ -188,7 +188,7 @@ h2.setumon{
 
 .markerPopup{
   display:none;
-  position:absolute;
+  position:fixed;
   z-index:50;
   background:#2b2f36;
   border-radius:20px;
@@ -221,3 +221,124 @@ h2.setumon{
 .q-list a{color:var(--accent-dark);font-weight:bold;text-decoration:none;font-size:1.05em;}
 .q-list a:hover{text-decoration:underline;}
 .q-list .desc{font-size:0.88em;color:#555;margin-top:4px;}
+
+/* =========================================================
+   CBT風レイアウト（左：問題文／右：解答欄）・メモ・画面反転
+   engine.js の initCbtLayout() が body に .cbt を付けたときだけ有効
+========================================================= */
+
+/* ---- ヘッダーバー ---- */
+.cbt-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  background:var(--main-bg);
+  border-bottom:3px solid var(--accent);
+  padding:8px 16px;
+}
+.cbt-titlebox{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 14px;min-width:0;}
+.cbt-titlebox h1{font-size:1.1em;border:none;padding:0;margin:0;}
+.cbt-titlebox .meta{margin:0;}
+.cbt-tools{display:flex;gap:8px;flex:none;}
+.cbt-btn{
+  font:inherit;
+  font-size:0.9em;
+  font-weight:bold;
+  color:var(--accent-dark);
+  background:var(--main-bg);
+  border:1.5px solid var(--accent);
+  border-radius:4px;
+  padding:5px 12px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.cbt-btn:hover{background:var(--sub-bg);}
+.cbt-btn[aria-pressed="true"]{background:var(--accent);color:#fff;}
+
+/* ---- 左右ペイン（広い画面） ---- */
+@media (min-width:901px){
+  body.cbt{padding:0;height:100vh;overflow:hidden;}
+  body.cbt .wrap{max-width:none;margin:0;height:100%;display:flex;flex-direction:column;}
+  .cbt-split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,11fr) minmax(0,9fr);}
+  .cbt-left{overflow-y:auto;padding:16px 20px 60px;border-right:3px solid var(--border);}
+  .cbt-right{min-height:0;display:flex;flex-direction:column;}
+  .cbt-right-scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 20px 40px;}
+  .cbt-left .mondai{margin-bottom:12px;}
+  .cbt-right-scroll > h2.setumon:first-child{margin-top:16px;}
+}
+
+/* ---- 狭い画面：従来どおり縦に並べる ---- */
+@media (max-width:900px){
+  .cbt-bar{flex-wrap:wrap;}
+  .cbt-right-scroll{padding:0;}
+}
+
+/* ---- メモ欄 ---- */
+.memo-panel{
+  flex:none;
+  background:var(--main-bg);
+  border-top:3px solid var(--accent);
+  padding:8px 14px 12px;
+}
+.memo-panel[hidden]{display:none;}
+.memo-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:0.9em;}
+.memo-head .memo-hint{color:#888;font-size:0.85em;flex:1;}
+.memo-head button{
+  font:inherit;font-size:0.85em;
+  background:var(--sub-bg);color:var(--text);
+  border:1px solid var(--border);border-radius:3px;
+  padding:2px 10px;cursor:pointer;
+}
+.memo-text{
+  width:100%;
+  height:170px;
+  resize:vertical;
+  font:inherit;
+  font-size:0.95em;
+  padding:8px 10px;
+  background:var(--main-bg);
+  color:var(--text);
+  border:1px solid #bbb;
+  border-radius:3px;
+}
+
+/* =========================================================
+   画面反転（ダークテーマ）
+========================================================= */
+html.invert{
+  --main-bg:#1d2025;
+  --sub-bg:#121417;
+  --border:#3b414a;
+  --accent:#2f6fc4;
+  --accent-dark:#8fbfff;
+  --text:#e8e8e8;
+  --maru:#4cc26b;
+  --sankaku:#e6b422;
+  --batu:#ff6b60;
+  color-scheme:dark;
+}
+html.invert .meta,
+html.invert .memo-head .memo-hint,
+html.invert .charcount,
+html.invert .note,
+html.invert .img_margin figcaption{color:#a8b0bb;}
+html.invert .qa-item textarea{background:#14161a;color:var(--text);border-color:#5a616c;}
+html.invert .memo-text{background:#14161a;border-color:#5a616c;}
+html.invert .result-box{color:var(--text);}
+html.invert .result-box.maru{background:#173323;}
+html.invert .result-box.sankaku{background:#3a3114;}
+html.invert .result-box.batu{background:#3d1d1a;}
+html.invert .model-answer{color:var(--text);}
+html.invert .mondai mark{color:#111;}
+html.invert .mondai .blank,
+html.invert .mondai .kakomi{border-color:var(--text);}
+html.invert .mondai code,
+html.invert .netbox{background:#2a2e35;color:var(--text);border-color:#6b7380;}
+html.invert .img_placeholder{background:#1a1d21;border-color:#5a616c;color:#a8b0bb;}
+html.invert #scoreSummary{background:var(--main-bg);}
+html.invert .cbt-btn[aria-pressed="true"]{color:#fff;}
+/* 図表（白地の画像・SVG）は階調を反転して背景になじませる */
+html.invert .img_margin img,
+html.invert .quad-wrap svg{filter:invert(1) hue-rotate(180deg);}
+html.invert .markerPopup{box-shadow:0 3px 10px rgba(0,0,0,.6);}
